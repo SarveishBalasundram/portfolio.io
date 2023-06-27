@@ -1,0 +1,75 @@
+.education{
+    color:black;
+    background-color: #1f242d;
+
+}
+
+#exp{
+    font-size: 4.5rem !important;
+    font-family: 'Poppins' !important;
+    font-weight: bold !important;
+    text-align: left !important;
+}
+
+.black{color:black}
+
+.vertical-timeline-element-date{
+    left:84% !important
+}
+
+.date-holder{
+    text-align: right;
+    padding-top: 2%;
+}
+
+.vertical-timeline-element-icon img{
+    position: absolute;
+    top: 1%;
+    left: 9.5%;
+    width:3.3rem;
+}
+
+#img1{
+    position: absolute;
+    top: 10%;
+    left: -19%;
+    width: 5.5rem;
+}
+
+#img2{
+    position: absolute;
+    top: 10%;
+    left: 13%;
+    width: 2.8rem;
+}
+
+.bounce-in{
+    transition: .5s
+}
+
+.bounce-in:hover{
+    box-shadow: 10px 10px 5px rgb(238, 242, 243);
+}
+
+@media only screen and (max-width: 1169px){
+    .vertical-timeline-element-icon img{
+        position: absolute;
+        top: 1%;
+        left: 8.5%;
+        width:2.2rem;
+    }
+    
+    #img1{
+        position: absolute;
+        top: 15%;
+        left: -15%;
+        width: 3.5rem;
+    }
+
+    #img2{
+        position: absolute;
+        top: 10%;
+        left: 13%;
+        width: 1.9rem;
+    }
+}

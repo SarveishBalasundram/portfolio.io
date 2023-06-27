@@ -1,0 +1,67 @@
+        <Swiper
+      slidesPerView={'auto'}
+        spaceBetween={190}
+
+        pagination={{
+          clickable: true,
+        }}
+        navigation={true}
+        modules={[ Pagination, Navigation]}
+        className="mySwiper"
+        grabCursor={true}
+      >
+
+        {file.map((elements,index)=>{
+                 return(
+                  
+                    <SwiperSlide  key={index}>
+                      <div className="swiper-slide-wrapper">
+                              <Document className="document" file={elements.fileName}>
+                                    <Page 
+                                    className="page swiper"
+                                    pageNumber={1}        
+                                    renderTextLayer={false}
+                                    renderAnnotationLayer={false}
+                                    customTextRenderer={false} />
+                                  </Document>
+                                  <div className="overlay-mask"></div> {/* Add the overlay mask element */}
+                                  </div>             
+                    </SwiperSlide>
+                 )   
+        })}
+        </Swiper>
+
+
+
+
+
+
+
+
+
+
+
+        <MDBCarousel className="hover-overlay" showControls showIndicators>
+
+      {file.map((elements,index)=>{
+        return(
+      <MDBCarouselItem
+        key={index+1}
+        className='w-100 d-block '
+        itemId={index+1}
+        alt='...'
+        src={elements.fileName}
+      >
+      <embed
+          src={elements.fileName}
+          type="application/pdf"
+          frameBorder="0"
+          scrolling="auto"
+          height="100%"
+          width="100%"
+      ></embed>
+
+      </MDBCarouselItem>
+        )
+      })}
+    </MDBCarousel>
