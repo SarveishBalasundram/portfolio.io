@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.d798ab24.css",
-    "main.js": "/static/js/main.9d9c4272.js",
-    "static/media/resume.pdf": "/static/media/resume.8885e5a6f91ac9d09ca1.pdf",
-    "static/media/sarveish.png": "/static/media/sarveish.dd2928ded32ab01ed9ae.png",
-    "static/media/slick.svg": "/static/media/slick.2630a3e3eab21c607e21.svg",
-    "static/media/slick.eot": "/static/media/slick.a4e97f5a2a64f0ab1323.eot",
-    "index.html": "/index.html",
-    "static/media/slick.ttf": "/static/media/slick.c94f7671dcc99dce43e2.ttf",
-    "static/media/slick.woff": "/static/media/slick.295183786cd8a1389865.woff",
-    "main.d798ab24.css.map": "/static/css/main.d798ab24.css.map",
-    "main.9d9c4272.js.map": "/static/js/main.9d9c4272.js.map"
+    "main.css": "./static/css/main.0e57a82f.css",
+    "main.js": "./static/js/main.ffcaa33e.js",
+    "static/media/resume.pdf": "./static/media/resume.8885e5a6f91ac9d09ca1.pdf",
+    "static/media/sarveish.png": "./static/media/sarveish.dd2928ded32ab01ed9ae.png",
+    "static/media/slick.svg": "./static/media/slick.2630a3e3eab21c607e21.svg",
+    "static/media/slick.eot": "./static/media/slick.a4e97f5a2a64f0ab1323.eot",
+    "index.html": "./index.html",
+    "static/media/slick.ttf": "./static/media/slick.c94f7671dcc99dce43e2.ttf",
+    "static/media/slick.woff": "./static/media/slick.295183786cd8a1389865.woff",
+    "main.0e57a82f.css.map": "./static/css/main.0e57a82f.css.map",
+    "main.ffcaa33e.js.map": "./static/js/main.ffcaa33e.js.map"
   },
   "entrypoints": [
-    "static/css/main.d798ab24.css",
-    "static/js/main.9d9c4272.js"
+    "static/css/main.0e57a82f.css",
+    "static/js/main.ffcaa33e.js"
   ]
 }
