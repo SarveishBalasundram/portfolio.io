@@ -6,10 +6,19 @@ import "slick-carousel/slick/slick-theme.css";
 import { TypeAnimation } from "react-type-animation";
 import { motion } from "framer-motion";
 
+import firstCert from "./first.png";
+import secondCert from "./second.png";
+import thirdCert from "./third.png";
+import iHaxPic from "./iHaxPic.png";
+import inventX from "./inventX.jpeg";
+import iTank from "./itank.jpeg";
+import forthCert from "./forth.png";
+import fifthCert from "./fifth.png";
+
 const certifications = [
   {
     id: 1,
-    image: "/cert/first.png",
+    image: firstCert,
     title: "HTML, CSS & JS Certification",
     issuer: "Coding Academy",
     date: "June 2023",
@@ -18,7 +27,7 @@ const certifications = [
   },
   {
     id: 2,
-    image: "/cert/second.png",
+    image: secondCert,
     title: "Back-End Development Certification",
     issuer: "Tech Institute",
     date: "August 2023",
@@ -27,7 +36,7 @@ const certifications = [
   },
   {
     id: 3,
-    image: "/cert/third.png",
+    image: thirdCert,
     title: "Python for Data Science & AI",
     issuer: "Data Science Org",
     date: "September 2023",
@@ -36,7 +45,7 @@ const certifications = [
   },
   {
     id: 4,
-    image: "/cert/iHaxPic.png",
+    image: iHaxPic,
     title: "I-Hax 2023 Winner",
     issuer: "National Hackathon",
     date: "October 2023",
@@ -45,16 +54,16 @@ const certifications = [
   },
   {
     id: 5,
-    image: "/cert/inventX.jpeg",
+    image: inventX,
     title: "InventX 2023 Gold Medal Winner",
     issuer: "UTM Innovation",
     date: "November 2023",
     description:
-      "Gold Medal in iNVENTX, formerly known as RICES, an exhibition that provides a platform for staff, researchers, and students from the wider public to showcase their innovative ideas and inventions. Also won the Best of Best Special Award.",
+      "Gold Medal winner at iNVENTX (formerly RICES) exhibition for innovative inventions. Also received the Best of Best Special Award.",
   },
   {
     id: 6,
-    image: "/cert/itank.jpeg",
+    image: iTank,
     title: "I-Tank 2023 Winner",
     issuer: "International Intervarsity",
     date: "December 2023",
@@ -63,7 +72,7 @@ const certifications = [
   },
   {
     id: 7,
-    image: "/cert/forth.png",
+    image: forthCert,
     title: "Top 10 Finalist BizMaker 2023",
     issuer: "BizMaker",
     date: "October 2023",
@@ -72,7 +81,7 @@ const certifications = [
   },
   {
     id: 8,
-    image: "/cert/fifth.png",
+    image: fifthCert,
     title: "Best Presenter GPBL 3.0",
     issuer: "GPBL",
     date: "November 2023",
@@ -213,11 +222,11 @@ function Certifications() {
         >
           <TypeAnimation
             sequence={[
-              "My Awards",
+              "Awards",
               1000,
-              "My Certifications",
+              "Certifications",
               1000,
-              "My Achievements",
+              "Achievements",
               1000,
             ]}
             wrapper="span"

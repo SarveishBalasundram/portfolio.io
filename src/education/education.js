@@ -16,12 +16,17 @@ import {
   TimelineContent,
 } from "@mui/lab";
 import { motion, useInView } from "framer-motion";
+import logoSMKRM from "./logoSMKRM.png";
+import pidmLogo from "./pidm.png";
+import uthmLogo from "./logoUTHM.png";
+import worldtechLogo from "./logoWTECH.png";
+import utmLogo from "./utm.png";
 
 const TypewriterTitle = () => {
   const [displayText, setDisplayText] = useState("");
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const texts = ["My Education Journey", "My Work Experiences"];
+  const texts = ["Education Journey", "Work Experiences"];
   const typingSpeed = 100;
   const deletingSpeed = 50;
   const pauseBetweenTexts = 2000;
@@ -123,7 +128,7 @@ const Education = () => {
     {
       id: 0,
       place: "SMK RAJA MAHADI",
-      image: "/logoSMKRM.png",
+      image: logoSMKRM,
       title: "SPM",
       date: "2013-2019",
       description: [
@@ -136,9 +141,9 @@ const Education = () => {
     {
       id: 1,
       place: "PIDM SCHOLARSHIP",
-      image: "/pidm.png",
+      image: pidmLogo,
       title: "Pembangunan Insan Didik Malaysia Scholar",
-      date: "2020-2023",
+      date: "2022-Current",
       description: [
         "Awarded prestigious national scholarship for outstanding academic achievements",
         "Recognized as one of Malaysia's top diploma students in IT field",
@@ -149,9 +154,9 @@ const Education = () => {
     {
       id: 2,
       place: "UNIVERSITI TUN HUSSEIN ONN MALAYSIA",
-      image: "/logoUTHM.png",
+      image: uthmLogo,
       title: "Diploma in Information Technology",
-      date: "2020-2023",
+      date: "Oct 2020- Jan 2023",
       description: [
         "Dean's List achiever for all 6 semesters (Perfect 4.00 for 4 semesters)",
         "Graduated with First Class Honors (CGPA: 3.98/4.00)",
@@ -164,9 +169,9 @@ const Education = () => {
     {
       id: 3,
       place: "WORLDTECH SOLUTIONS SDN BHD",
-      image: "/logoWTECH.png",
+      image: worldtechLogo,
       title: "Intern → Junior Software Developer",
-      date: "Feb 2023 - Jan 2024",
+      date: "Aug 2022 - July 2023",
       description: [
         "Promoted from Intern to Junior Developer",
         "Led project teams through full Agile lifecycle",
@@ -178,9 +183,9 @@ const Education = () => {
     {
       id: 4,
       place: "UNIVERSITI TEKNOLOGI MALAYSIA",
-      image: "/utm.png",
+      image: utmLogo,
       title: "Bachelor of Computer Science (Software Engineering)",
-      date: "2023-Present",
+      date: "2023-Current",
       description: [
         "Current CGPA: 3.98/4.00",
         "Specializing in advanced software engineering principles",

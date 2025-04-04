@@ -364,14 +364,7 @@ const Skills = () => {
             }}
           >
             <TypeAnimation
-              sequence={[
-                "My Tech Stack",
-                1000,
-                "My Skills",
-                1000,
-                "My Expertise",
-                1000,
-              ]}
+              sequence={["Tech Stack", 1000, "Skills", 1000, "Expertise", 1000]}
               wrapper="span"
               cursor={true}
               repeat={Infinity}

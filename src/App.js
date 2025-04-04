@@ -157,6 +157,7 @@ function App() {
                 flex: 1,
                 display: "flex",
                 flexDirection: "column",
+                pt: { xs: "56px", md: "64px" }, // Add padding to account for fixed navbar
               }}
             >
               <section id="header">
