@@ -1,102 +1,380 @@
-import { parse } from "postcss";
-import "./header.css"
+import React, { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { Box, Typography, Button, IconButton } from "@mui/material";
+import {
+  FaGithub,
+  FaLinkedin,
+  FaEnvelope,
+  FaInstagram,
+  FaFacebook,
+} from "react-icons/fa";
+import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 
-import React from 'react';
-import { useEffect,useState } from "react";
-function Header({scroll, changeToggler,sectionScroll}){
+const Starfield = () => {
+  const starsRef = useRef();
+  const count = 2000;
 
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 2000;
+  }
 
-
-    if(sectionScroll ==""){
-        sectionScroll = "certification"
+  useFrame(() => {
+    if (starsRef.current) {
+      starsRef.current.rotation.x += 0.0002;
+      starsRef.current.rotation.y += 0.0005;
     }
+  });
 
-    console.log(sectionScroll)
+  return (
+    <points ref={starsRef}>
+      <bufferGeometry attach="geometry">
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          count={positions.length / 3}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        attach="material"
+        size={1.5}
+        sizeAttenuation={true}
+        color="#ffffff"
+        transparent
+        opacity={0.8}
+      />
+    </points>
+  );
+};
 
-    const [isOpen, setIsOpen] = useState(false);
+const ThreeJSBackground = () => {
+  return (
+    <Canvas
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 0,
+      }}
+      camera={{ position: [0, 0, 1], fov: 75 }}
+    >
+      <ambientLight intensity={0.5} />
+      <Starfield />
+    </Canvas>
+  );
+};
 
-    const toggleNavbar = () => {
-      setIsOpen(!isOpen);
-    };
+const Header = () => {
+  const [typedText, setTypedText] = useState("");
+  const tagline =
+    "Unlocking limitless possibilities through the art of software engineering.";
 
+  useEffect(() => {
+    let i = 0;
+    const typingInterval = setInterval(() => {
+      if (i < tagline.length) {
+        setTypedText(tagline.substring(0, i + 1));
+        i++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 50);
 
+    return () => clearInterval(typingInterval);
+  }, [tagline]);
 
-function clickNavLinks(){
-    changeToggler()
-        const hamburger = document.querySelector(".hamburger");
-        const navLinks = document.querySelector(".nav-links");
-        const links = document.querySelectorAll(".nav-links li");
+  const socialLinks = [
+    {
+      icon: <FaGithub />,
+      url: "https://github.com/SarveishBalasundram",
+      color: "#f0f6fc",
+    },
+    {
+      icon: <FaEnvelope />,
+      url: "mailto:b.sarveish26@gmail.com",
+      color: "#ea4335",
+    },
+    {
+      icon: <FaLinkedin />,
+      url: "https://www.linkedin.com/in/sarveish-balasundram/",
+      color: "#0a66c2",
+    },
+    {
+      icon: <FaInstagram />,
+      url: "https://www.instagram.com/sarveish/",
+      color: "#e1306c",
+    },
+  ];
 
-        navLinks.classList.toggle("open");
-    links.forEach(link => {
-        link.classList.toggle("fades");
-    });
+  return (
+    <Box
+      component="header"
+      sx={{
+        height: "100vh",
+        width: "100%",
+        position: "relative",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+        background: "linear-gradient(to bottom, #0a0a1a 0%,rgb(5, 5, 21) 100%)",
+        textAlign: "center",
+        px: 2,
+      }}
+      id="header"
+    >
+      <ThreeJSBackground />
 
-    //Hamburger Animation
-    hamburger.classList.toggle("toggle");
-}
+      <Box
+        sx={{
+          zIndex: 2,
+          maxWidth: "1000px",
+          width: "90%",
+          mx: "auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {/* Name with Glitch Effect */}
+        <Box sx={{ mb: { xs: 3, md: 5 } }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            <Typography
+              variant="h1"
+              sx={{
+                position: "relative",
+                fontSize: { xs: "3rem", sm: "4rem", md: "5rem" },
+                fontWeight: 700,
+                letterSpacing: "3px",
+                mb: 2,
+                textTransform: "uppercase",
+                lineHeight: 1.1,
+                "&::before, &::after": {
+                  content: "attr(data-text)",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  opacity: 0.8,
+                },
+                "&::before": {
+                  left: "2px",
+                  textShadow: "-2px 0 #ff00c1",
+                  clip: "rect(44px, 450px, 56px, 0)",
+                  animation: "glitch-anim 5s infinite linear alternate-reverse",
+                },
+                "&::after": {
+                  left: "-2px",
+                  textShadow: "-2px 0 #00fff9",
+                  clip: "rect(44px, 450px, 56px, 0)",
+                  animation:
+                    "glitch-anim2 5s infinite linear alternate-reverse",
+                },
+                "@keyframes glitch-anim": {
+                  "0%": { clip: "rect(31px, 9999px, 94px, 0)" },
+                  "20%": { clip: "rect(112px, 9999px, 76px, 0)" },
+                  "40%": { clip: "rect(75px, 9999px, 107px, 0)" },
+                  "60%": { clip: "rect(98px, 9999px, 109px, 0)" },
+                  "80%": { clip: "rect(95px, 9999px, 53px, 0)" },
+                  "100%": { clip: "rect(31px, 9999px, 14px, 0)" },
+                },
+                "@keyframes glitch-anim2": {
+                  "0%": { clip: "rect(65px, 9999px, 119px, 0)" },
+                  "20%": { clip: "rect(66px, 9999px, 22px, 0)" },
+                  "40%": { clip: "rect(33px, 9999px, 85px, 0)" },
+                  "60%": { clip: "rect(87px, 9999px, 4px, 0)" },
+                  "80%": { clip: "rect(58px, 9999px, 103px, 0)" },
+                  "100%": { clip: "rect(8px, 9999px, 100px, 0)" },
+                },
+              }}
+              data-text="Sarveish Balasundram"
+            >
+              Sarveish Balasundram
+            </Typography>
+          </motion.div>
 
-return (
-<header className="header">
-<nav  className={scroll ? "block" : "none"} >
-    <div className="hamburger" onClick={()=>{
-        changeToggler()
-        const hamburger = document.querySelector(".hamburger");
-        const navLinks = document.querySelector(".nav-links");
-        const links = document.querySelectorAll(".nav-links li");
+          {/* Tagline with Typewriter Effect */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          >
+            <Typography
+              variant="h3"
+              sx={{
+                display: "inline-block",
+                position: "relative",
+                letterSpacing: "1.5px",
+                fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
+                fontWeight: 400,
+                lineHeight: 1.5,
+                maxWidth: "700px",
+                "&::after": {
+                  content: '"|"',
+                  display: "inline-block",
+                  ml: 0.5,
+                  animation: "blink 0.7s infinite",
+                },
+                "@keyframes blink": {
+                  "0%, 100%": { opacity: 1 },
+                  "50%": { opacity: 0 },
+                },
+              }}
+            >
+              {typedText}
+            </Typography>
+          </motion.div>
+        </Box>
 
-        navLinks.classList.toggle("open");
-    links.forEach(link => {
-        link.classList.toggle("fades");
-    });
+        {/* Social Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1.75rem",
+            width: "100%",
+          }}
+        >
+          {/* Hire Me Button */}
+          <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              component="a"
+              href="https://www.linkedin.com/in/sarveish-balasundram/"
+              target="_blank"
+              variant="contained"
+              sx={{
+                px: 5,
+                py: 1.5,
+                borderRadius: "50px",
+                fontWeight: 600,
+                fontSize: "1.1rem",
+                bgcolor: "#0a66c2",
+                "&:hover": {
+                  bgcolor: "#004182",
+                },
+              }}
+            >
+              Hire Me
+            </Button>
+          </motion.div>
 
-    //Hamburger Animation
-    hamburger.classList.toggle("toggle");
-    }}>
-        <div className="line1"></div>
-        <div className="line2"></div>
-        <div className="line3"></div>
-    </div>
-    <ul className="nav-links">
-        <li><a onClick={()=>{
-        clickNavLinks()
-        }} href="#header" className={sectionScroll=="header"? "actives":""}>Home</a></li>
+          {/* Social Icons */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: "1.5rem",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {socialLinks.map((link, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ y: -3, scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <IconButton
+                  component="a"
+                  href={link.url}
+                  sx={{
+                    width: 50,
+                    height: 50,
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                    "&:hover": {
+                      bgcolor: "rgba(255, 255, 255, 0.2)",
+                    },
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      color: "white",
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color: link.color,
+                      },
+                    }}
+                  >
+                    {link.icon}
+                  </Box>
+                </IconButton>
+              </motion.div>
+            ))}
+          </Box>
+        </motion.div>
 
-        <li><a href="#aboutMe" className={sectionScroll=="aboutMe"? "actives":""} onClick={()=>{
-        clickNavLinks()
-        }}>About Me</a></li>
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.75rem",
+            marginTop: "3rem",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              height: "60px",
+            }}
+          >
+            {[...Array(3)].map((_, i) => (
+              <Box
+                key={i}
+                sx={{
+                  width: "20px",
+                  height: "20px",
+                  borderRight: "3px solid",
+                  borderBottom: "3px solid",
+                  borderColor: "white",
+                  transform: "rotate(45deg)",
+                  mt: "-10px",
+                  opacity: 0,
+                  animation: "pulse 2s infinite",
+                  animationDelay: `${i * 0.33}s`,
+                  "@keyframes pulse": {
+                    "0%": {
+                      opacity: 0,
+                      transform: "rotate(45deg) translateY(-20px)",
+                    },
+                    "50%": { opacity: 1 },
+                    "100%": {
+                      opacity: 0,
+                      transform: "rotate(45deg) translateY(20px)",
+                    },
+                  },
+                }}
+              />
+            ))}
+          </Box>
+          <Typography variant="body1" sx={{ fontSize: "1.1rem" }}>
+            Explore my portfolio
+          </Typography>
+        </motion.div>
+      </Box>
+    </Box>
+  );
+};
 
-        <li><a href="#experience" className={sectionScroll=="experience"? "actives":""} onClick={()=>{
-        clickNavLinks()
-         }}>Experiences</a></li>
-
-        <li><a href="#skills" className={sectionScroll=="skills"? "actives":""} onClick={()=>{
-        clickNavLinks()
-         }}>Skills</a></li>
-
-        <li><a href="#certification" className={sectionScroll=="certification"? "actives":""} onClick={()=>{
-        clickNavLinks()
-         }}>Certifications</a></li>
-    </ul>
-</nav>
-
-
-<div className="container-fluid">
-<div className="svg-container">
-<svg  viewBox="0 0 200 480" preserveAspectRatio="xMinYMin meet" className="svg-content" ><rect x="0" y="0" width="100vw" height="100vh" fill="#001220"></rect><path d="M0 327L22.8 331.7C45.7 336.3 91.3 345.7 137 351.8C182.7 358 228.3 361 274 366.3C319.7 371.7 365.3 379.3 411.2 371.3C457 363.3 503 339.7 548.8 340.3C594.7 341 640.3 366 686 380C731.7 394 777.3 397 823 385.2C868.7 373.3 914.3 346.7 937.2 333.3L960 320L960 541L937.2 541C914.3 
-541 868.7 541 823 541C777.3 541 731.7 541 686 541C640.3 541 594.7 541 548.8 541C503 541 457 541 411.2 541C365.3 541 319.7 541 274 541C228.3 541 182.7 541 137 541C91.3 541 45.7 541 22.8 541L0 541Z" fill="#fa7268"></path><path d="M0 392L22.8 393.7C45.7 395.3 91.3 398.7 137 402.8C182.7 407 228.3 412 274 408.2C319.7 404.3 365.3 391.7 411.2 387C457 382.3 503 385.7 548.8 391C594.7 396.3 640.3 403.7 686 403.2C731.7 402.7 777.3 394.3 823 387.2C868.7 380 914.3 374 937.2 371L960 368L960 541L937.2 541C914.3 541 868.7 541 823 541C777.3 541 731.7 541 686 541C640.3 541 594.7 541 548.8 541C503 541 457 541 411.2 541C365.3 541 319.7 541 274 541C228.3 541 182.7 541 137 541C91.3 541 45.7 541 22.8 541L0 541Z" fill="#ef5f67"></path><path d="M0 419L22.8 418.8C45.7 418.7 91.3 418.3 137 415C182.7 411.7 228.3 405.3 274 411C319.7 416.7 365.3 434.3 411.2 441.5C457 448.7 503 445.3 548.8 445.2C594.7 445 640.3 448 686 446.2C731.7 444.3 777.3 437.7 823 431.3C868.7 425 914.3 419 937.2 416L960 413L960 541L937.2 541C914.3 541 868.7 541 823 541C777.3 541 731.7 541 686 541C640.3 541 594.7 541 548.8 541C503 541 457 541 411.2 541C365.3 541 319.7 541 274 541C228.3 541 182.7 541 137 541C91.3 541 45.7 541 22.8 541L0 541Z" fill="#e34c67"></path><path d="M0 487L22.8 479.5C45.7 472 91.3 457 137 455.8C182.7 454.7 228.3 467.3 274 467.8C319.7 468.3 365.3 456.7 411.2 454C457 451.3 503 457.7 548.8 457.7C594.7 457.7 640.3 451.3 686 449.8C731.7 448.3 777.3 451.7 823 457.7C868.7 463.7 914.3 472.3 937.2 476.7L960 481L960 541L937.2 541C914.3 541 868.7 541 823 541C777.3 541 731.7 541 686 541C640.3 541 594.7 541 548.8 541C503 541 457 541 411.2 541C365.3 541 319.7 541 274 541C228.3 541 182.7 541 137 541C91.3 541 45.7 541 22.8 541L0 541Z" fill="#d53867"></path><path d="M0 477L22.8 482.7C45.7 488.3 91.3 499.7 137 506.2C182.7 512.7 228.3 514.3 274 510.7C319.7 507 365.3 498 411.2 491.8C457 485.7 503 482.3 548.8 479.7C594.7 477 640.3 475 686 475C731.7 475 777.3 477 823 484C868.7 491 914.3 503 937.2 509L960 515L960 541L937.2 541C914.3 541 868.7 541 823 541C777.3 541 731.7 541 686 541C640.3 541 594.7 541 548.8 541C503 541 457 541 411.2 541C365.3 541 319.7 541 274 541C228.3 541 182.7 541 137 541C91.3 541 45.7 541 22.8 541L0 541Z" fill="#c62368"></path></svg>
-</div>
-
-    <div className="box">
-        <h1 className="text-center">Sarveish Balasundram</h1>
-        <h3>Unlocking limitless possibilities through the art of software engineering.</h3>
-    </div>
-
-  </div>
-
-</header>
-
-)
-}
-
-export default Header
+export default Header;

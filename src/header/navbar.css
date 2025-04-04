@@ -1,0 +1,126 @@
+/* Navbar Styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem 2rem;
+    z-index: 1000;
+    background: rgba(0, 18, 32, 0.7);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+  
+  .navbar.scrolled {
+    background: rgba(0, 18, 32, 0.95);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 1rem 2rem;
+  }
+  
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .nav-brand {
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  
+  /* Desktop Navigation */
+  .desktop-nav {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  
+  .desktop-nav li a {
+    position: relative;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    overflow: hidden;
+  }
+  
+  .desktop-nav li a .nav-highlight {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: #c62368;
+  }
+  
+  .desktop-nav li a.active {
+    color: #c62368;
+  }
+  
+  .desktop-nav li a.active .nav-highlight {
+    width: 100% !important;
+  }
+  
+  /* Mobile Menu Button */
+  .mobile-menu-button {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  
+  /* Mobile Menu */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 70%;
+    height: 100vh;
+    background: rgba(0, 18, 32, 0.98);
+    backdrop-filter: blur(10px);
+    padding: 6rem 2rem;
+    z-index: 1000;
+  }
+  
+  .mobile-menu ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0;
+  }
+  
+  .mobile-menu li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 500;
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-menu li a.active {
+    color: #c62368;
+    background: rgba(198, 35, 104, 0.1);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .desktop-nav {
+      display: none;
+    }
+  
+    .mobile-menu-button {
+      display: block;
+    }
+  
+    .navbar {
+      padding: 1rem;
+    }
+  }

@@ -1,75 +1,261 @@
-.education{
-    color:black;
-    background-color: #1f242d;
-
+.education-section {
+  position: relative;
+  padding: 6rem 2rem;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  overflow: hidden;
+  z-index: 1;
 }
 
-#exp{
-    font-size: 4.5rem !important;
-    font-family: 'Poppins' !important;
-    font-weight: bold !important;
-    text-align: left !important;
+.education-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
-.black{color:black}
-
-.vertical-timeline-element-date{
-    left:84% !important
+.section-title {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  background: linear-gradient(45deg, #9d00ff, #d400ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.date-holder{
-    text-align: right;
-    padding-top: 2%;
+/* Timeline styles */
+.timeline-connector {
+  position: relative;
+  height: 4px;
+  background: rgba(157, 0, 255, 0.1);
+  border-radius: 2px;
+  margin: 2rem auto;
+  max-width: 800px;
+  overflow: hidden;
 }
 
-.vertical-timeline-element-icon img{
-    position: absolute;
-    top: 1%;
-    left: 9.5%;
-    width:3.3rem;
+.timeline-line {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #9d00ff, #d400ff);
+  opacity: 0.3;
 }
 
-#img1{
-    position: absolute;
-    top: 10%;
-    left: -19%;
-    width: 5.5rem;
+.timeline-progress {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(90deg, #9d00ff, #d400ff);
+  transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-#img2{
-    position: absolute;
-    top: 10%;
-    left: 13%;
-    width: 2.8rem;
+.timeline-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 3rem;
 }
 
-.bounce-in{
-    transition: .5s
+.experience-card {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-left: 4px solid #9d00ff;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(157, 0, 255, 0.1);
 }
 
-.bounce-in:hover{
-    box-shadow: 10px 10px 5px rgb(238, 242, 243);
+.experience-card.active {
+  border-left-width: 6px;
+  background: rgba(40, 40, 40, 0.8);
 }
 
-@media only screen and (max-width: 1169px){
-    .vertical-timeline-element-icon img{
-        position: absolute;
-        top: 1%;
-        left: 8.5%;
-        width:2.2rem;
-    }
-    
-    #img1{
-        position: absolute;
-        top: 15%;
-        left: -15%;
-        width: 3.5rem;
-    }
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+}
 
-    #img2{
-        position: absolute;
-        top: 10%;
-        left: 13%;
-        width: 1.9rem;
-    }
+.card-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border: 2px solid rgba(157, 0, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.card-icon img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  filter: brightness(1.1);
+}
+
+.card-date {
+  font-size: 0.9rem;
+  color: #b36bff;
+  font-weight: 600;
+}
+
+.card-body {
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.card-subtitle {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #cccccc;
+  font-weight: 500;
+}
+
+.card-description {
+  padding-left: 1rem;
+}
+
+.description-item {
+  margin-bottom: 0.8rem;
+  color: #e0e0e0;
+  line-height: 1.6;
+  position: relative;
+}
+
+.description-item::before {
+  content: '•';
+  color: #9d00ff;
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.card-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #9d00ff, #d400ff);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.timeline-dots {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(157, 0, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.timeline-dot.active {
+  background: #9d00ff;
+  transform: scale(1.3);
+}
+
+/* Bottom section purple shapes */
+.bottom-section-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bottom-section-shapes .shape-1,
+.bottom-section-shapes .shape-2,
+.bottom-section-shapes .shape-3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  animation-timing-function: ease-in-out;
+}
+
+.bottom-section-shapes .shape-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #9d00ff 0%, transparent 70%);
+  top: -100px;
+  left: -100px;
+  animation: float 17s infinite 2s;
+}
+
+.bottom-section-shapes .shape-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #d400ff 0%, transparent 70%);
+  bottom: -150px;
+  right: -100px;
+  animation: float 19s infinite reverse 1s;
+}
+
+.bottom-section-shapes .shape-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #6a00ff 0%, transparent 70%);
+  top: 40%;
+  left: 30%;
+  animation: float 14s infinite alternate 0.5s;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .education-section {
+    padding: 4rem 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .bottom-section-shapes .shape-1,
+  .bottom-section-shapes .shape-2,
+  .bottom-section-shapes .shape-3 {
+    filter: blur(60px);
+  }
+  
+  .experience-card {
+    backdrop-filter: none;
+  }
 }

@@ -1,0 +1,118 @@
+.certifications-section {
+  padding: 100px 0;
+  background: var(--primary-bg);
+}
+
+.certifications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.certification-card {
+  height: 400px;
+  perspective: 1000px;
+  position: relative;
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.8s;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-front {
+  background: var(--secondary-bg);
+  transform: rotateY(0deg);
+}
+
+.certification-card:hover .card-front {
+  transform: rotateY(180deg);
+}
+
+.card-back {
+  background: linear-gradient(135deg, var(--accent-color), #6a00ff);
+  transform: rotateY(180deg);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.certification-card:hover .card-back {
+  transform: rotateY(0deg);
+}
+
+.cert-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.card-front:hover .card-overlay {
+  transform: translateY(0);
+}
+
+.card-overlay h3 {
+  margin-bottom: 15px;
+  color: white;
+}
+
+.view-button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.view-button:hover {
+  background: white;
+  color: var(--accent-color);
+  transform: translateY(-3px);
+}
+
+.card-back h3 {
+  color: white;
+  margin-bottom: 20px;
+}
+
+.card-back p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .certifications-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .certification-card {
+    height: 350px;
+  }
+}

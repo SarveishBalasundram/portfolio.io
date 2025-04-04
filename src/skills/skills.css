@@ -1,116 +1,95 @@
-
-
-.con{
-   justify-content:center;
-   text-align: center;
-   justify-items: center; 
-   margin-bottom: 50px;
+.skills-section {
+  padding: 100px 0;
+  background: var(--secondary-bg);
 }
 
-.skillsCont{
-   justify-content: center;
-   padding-bottom: 50px;
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-#skill{
-   font-size: 4.5rem !important;
-   font-family: 'Poppins' !important;
-   font-weight: bold !important;
-   text-align: left !important;
+.skills-category {
+  flex: 1;
+  min-width: 300px;
+  background: var(--primary-bg);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
-.tech-icons{
-   border: 1.7px solid rgba(200,137,230,.637)!important;
-    border-radius: 5px!important;
-    box-shadow: 4px 5px 4px 3px rgba(89,4,168,.137)!important;
-    font-size: 4.5em!important;
-    margin: 15px!important;
-    opacity: .93!important;
-    overflow: hidden!important;
-    padding: 10px!important;
-    text-align: center!important;
-    transition: all .4s ease 0s transform background-color transition !important;
-    vertical-align: middle!important;
+.skills-category:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(157, 0, 255, 0.3);
 }
 
-.tech-icons:hover{
-   transform:scale(1.1);
-   background-color: #db06b1;
-   transition: .7s;
-   
+.skills-category h3 {
+  color: var(--accent-color);
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  text-align: center;
 }
 
-@keyframes iconHover {
-   0% {transform:scale(0)}
-   100% {
-      transform:scale(1.1);
-      background-color: #db06b1;
-   }
+.skill-item {
+  margin-bottom: 20px;
 }
 
-.col-sm-4 .btn-hover{
-   width:90%
+.skill-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
-@media only screen and (max-width:568px) {
-   .con{
-      justify-content:center;
-      text-align: center;
-      justify-items: center; 
-   }
-   .col-small{
-      width:100%
-   }
-
+.skill-name {
+  font-weight: 500;
 }
 
-.buttons {
-   text-align: center;
-
+.skill-percent {
+  color: var(--text-secondary);
 }
 
-
-.btn-hover {
-   text-transform: uppercase;
-   width: 50%;
-   font-size: 1.2rem;
-   font-weight: 600;
-   color: #fff;
-   cursor: pointer;
-   margin: 20px;
-   height: 55px;
-   text-align:center;
-   border: none;
-   background-size: 300% 100%;
-   border-radius: 9px;
-   /* moz-transition: all .4s ease-in-out;
-   -o-transition: all .4s ease-in-out;
-   -webkit-transition: all .4s ease-in-out;
-   transition: all .4s ease-in-out; */
+.skill-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-.btn-hover:hover {
-   background-position: 100% 0;
-   moz-transition: all .4s ease-in-out;
-   -o-transition: all .4s ease-in-out;
-   -webkit-transition: all .4s ease-in-out;
-   transition: all .4s ease-in-out;
-
+.skill-level {
+  height: 100%;
+  border-radius: 4px;
+  position: relative;
 }
 
-.btn-hover:focus {
-   border: 3px solid;
-   border-color: white;
-   transform: scaleX(1.08);
-   outline: none;
+.skill-level::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.1)
+  );
+  animation: shine 2s infinite;
 }
 
-.btn-hover.color-9 {
-   background-image: linear-gradient(to right, #25aae1, #4481eb, #04befe, #3f86ed);
-   box-shadow: 0 4px 15px 0 rgba(65, 132, 234, 0.75);
-
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
-.fade-in {
-   transform: translateX(-100%);
-   transition: transform 0.3s ease-out;
- }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .skills-category {
+    min-width: 100%;
+  }
+}
