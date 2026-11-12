@@ -1,496 +1,340 @@
-import { useState, useRef, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Box,
-  Typography,
-  Avatar,
-  useTheme,
-  useMediaQuery,
-  Paper,
-} from "@mui/material";
+  motion,
+  useInView,
+  useReducedMotion,
+  AnimatePresence,
+} from "framer-motion";
 import {
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineDot,
-  TimelineConnector,
-  TimelineContent,
-} from "@mui/lab";
-import { motion, useInView } from "framer-motion";
-import logoSMKRM from "./logoSMKRM.png";
-import pidmLogo from "./pidm.png";
-import uthmLogo from "./logoUTHM.png";
-import worldtechLogo from "./logoWTECH.png";
-import utmLogo from "./utm.png";
+  FaGraduationCap,
+  FaBriefcase,
+  FaAward,
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
+import experiences from "../data/experience.js";
+import "./education.css";
 
-const TypewriterTitle = () => {
-  const [displayText, setDisplayText] = useState("");
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const texts = ["Education Journey", "Work Experiences"];
-  const typingSpeed = 100;
-  const deletingSpeed = 50;
-  const pauseBetweenTexts = 2000;
+const TYPE_CONFIG = {
+  education: {
+    label: "Education",
+    icon: <FaGraduationCap />,
+    color: "#A78BFA",
+  },
+  work: { label: "Work Experience", icon: <FaBriefcase />, color: "#8B5CF6" },
+  award: { label: "Scholarship", icon: <FaAward />, color: "#C4B5FD" },
+};
+
+export default function Education() {
+  const ref = useRef(null);
+  const listRef = useRef(null);
+  const btnRefs = useRef({});
+  const firstScroll = useRef(true);
+  const reduced = useReducedMotion();
+  const inView = useInView(ref, { once: true, amount: 0.15 });
+  const [active, setActive] = useState(experiences[experiences.length - 1].id);
+  const [edges, setEdges] = useState({ left: false, right: false });
+  const [compact, setCompact] = useState(false);
+
+  const foundIndex = experiences.findIndex((e) => e.id === active);
+  const activeIndex = foundIndex === -1 ? 0 : foundIndex;
+  const activeEntry = experiences[activeIndex];
+
+  const goTo = useCallback((index) => {
+    const next = Math.max(0, Math.min(experiences.length - 1, index));
+    setActive(experiences[next].id);
+    return next;
+  }, []);
+
+  // Small-screen mode: timeline becomes a horizontal strip and the card can be swiped
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 900px)");
+    const update = () => setCompact(mq.matches);
+    update();
+    if (mq.addEventListener) mq.addEventListener("change", update);
+    else mq.addListener(update);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", update);
+      else mq.removeListener(update);
+    };
+  }, []);
+
+  // Keep the selected chip centred in the strip (no-op when the timeline is vertical)
+  useEffect(() => {
+    if (!inView) return;
+    const list = listRef.current;
+    const btn = btnRefs.current[active];
+    if (!list || !btn || list.scrollWidth <= list.clientWidth + 1) {
+      firstScroll.current = false;
+      return;
+    }
+    const lr = list.getBoundingClientRect();
+    const br = btn.getBoundingClientRect();
+    const left =
+      list.scrollLeft + (br.left - lr.left) - (lr.width - br.width) / 2;
+    list.scrollTo({
+      left,
+      behavior: firstScroll.current || reduced ? "auto" : "smooth",
+    });
+    firstScroll.current = false;
+  }, [active, inView, compact, reduced]);
+
+  // Show an edge fade only on the side that still has hidden chips
+  const updateEdges = useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const left = el.scrollLeft > 4;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setEdges((prev) =>
+      prev.left === left && prev.right === right ? prev : { left, right },
+    );
+  }, []);
 
   useEffect(() => {
-    let timeout;
-    const currentText = texts[currentTextIndex];
-
-    if (isDeleting) {
-      if (displayText.length > 0) {
-        timeout = setTimeout(() => {
-          setDisplayText(currentText.substring(0, displayText.length - 1));
-        }, deletingSpeed);
-      } else {
-        setIsDeleting(false);
-        setCurrentTextIndex((prev) => (prev + 1) % texts.length);
-      }
-    } else {
-      if (displayText.length < currentText.length) {
-        timeout = setTimeout(() => {
-          setDisplayText(currentText.substring(0, displayText.length + 1));
-        }, typingSpeed);
-      } else {
-        timeout = setTimeout(() => {
-          setIsDeleting(true);
-        }, pauseBetweenTexts);
-      }
+    const el = listRef.current;
+    if (!el) return;
+    updateEdges();
+    el.addEventListener("scroll", updateEdges, { passive: true });
+    window.addEventListener("resize", updateEdges);
+    let ro;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(updateEdges);
+      ro.observe(el);
+      Array.from(el.children).forEach((child) => ro.observe(child));
     }
+    return () => {
+      el.removeEventListener("scroll", updateEdges);
+      window.removeEventListener("resize", updateEdges);
+      if (ro) ro.disconnect();
+    };
+  }, [updateEdges]);
 
-    return () => clearTimeout(timeout);
-  }, [displayText, currentTextIndex, isDeleting]);
-
-  return (
-    <Typography
-      variant="h1"
-      sx={{
-        textAlign: "left",
-        mb: { xs: 4, sm: 6 },
-        background: "linear-gradient(45deg, #c62368, #f562a9)",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        fontWeight: 800,
-        fontSize: { xs: "2rem", sm: "2.8rem", md: "4rem" },
-        textShadow: `
-          0 0 5px rgba(198, 35, 104, 0.5),
-          0 0 10px rgba(198, 35, 104, 0.4),
-          0 0 15px rgba(198, 35, 104, 0.3),
-          0 0 20px rgba(198, 35, 104, 0.2),
-          0 0 25px rgba(198, 35, 104, 0.1),
-          0 4px 8px rgba(0,0,0,0.3),
-          0 8px 16px rgba(0,0,0,0.2)
-        `,
-        letterSpacing: "1px",
-        lineHeight: "1.2",
-        fontFamily: "'Poppins', sans-serif",
-        position: "relative",
-        display: "inline-block",
-        "&::after": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          mixBlendMode: "overlay",
-          borderRadius: "inherit",
-          pointerEvents: "none",
-        },
-      }}
-    >
-      {displayText}
-      <motion.span
-        animate={{ opacity: [0, 1, 0] }}
-        transition={{
-          repeat: Infinity,
-          duration: 0.8,
-          ease: "easeInOut",
-        }}
-        style={{
-          marginLeft: "4px",
-          textShadow: "0 0 8px rgba(198, 35, 104, 0.7)",
-          fontWeight: 400,
-        }}
-      >
-        |
-      </motion.span>
-    </Typography>
-  );
-};
-
-const Education = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, amount: 0.3 });
-
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [experiences] = useState([
-    {
-      id: 0,
-      place: "SMK RAJA MAHADI",
-      image: logoSMKRM,
-      title: "SPM",
-      date: "2013-2019",
-      description: [
-        "Achieved outstanding academic performance: 1A+, 4A, 3A-, 2B+",
-        "Ranked among top 5% of students in the school",
-        "Active participant in science and mathematics competitions",
-        "Developed strong foundation in problem-solving and analytical thinking",
-      ],
-    },
-    {
-      id: 1,
-      place: "PIDM SCHOLARSHIP",
-      image: pidmLogo,
-      title: "Pembangunan Insan Didik Malaysia Scholar",
-      date: "2022-Current",
-      description: [
-        "Awarded prestigious national scholarship for outstanding academic achievements",
-        "Recognized as one of Malaysia's top diploma students in IT field",
-        "Participated in leadership development programs and community initiatives",
-        "Represented PIDM at various academic and professional events",
-      ],
-    },
-    {
-      id: 2,
-      place: "UNIVERSITI TUN HUSSEIN ONN MALAYSIA",
-      image: uthmLogo,
-      title: "Diploma in Information Technology",
-      date: "Oct 2020- Jan 2023",
-      description: [
-        "Dean's List achiever for all 6 semesters (Perfect 4.00 for 4 semesters)",
-        "Graduated with First Class Honors (CGPA: 3.98/4.00)",
-        "Course Representative for Diploma in IT program",
-        "Developed multiple full-stack projects including inventory systems",
-        "Specialized in software development, database systems, and web technologies",
-        "Active in competitive programming and hackathon events",
-      ],
-    },
-    {
-      id: 3,
-      place: "WORLDTECH SOLUTIONS SDN BHD",
-      image: worldtechLogo,
-      title: "Intern → Junior Software Developer",
-      date: "Aug 2022 - July 2023",
-      description: [
-        "Promoted from Intern to Junior Developer",
-        "Led project teams through full Agile lifecycle",
-        "Developed production systems using Angular and Spring Boot",
-        "Implemented Power BI integrations for data analytics",
-        "Enhanced software quality through automated testing",
-      ],
-    },
-    {
-      id: 4,
-      place: "UNIVERSITI TEKNOLOGI MALAYSIA",
-      image: utmLogo,
-      title: "Bachelor of Computer Science (Software Engineering)",
-      date: "2023-Current",
-      description: [
-        "Current CGPA: 3.98/4.00",
-        "Specializing in advanced software engineering principles",
-        "Research focus on Web and Mobile applications",
-        "Active in university's tech society and programming competitions",
-      ],
-    },
-  ]);
-
-  const [particles] = useState(
-    Array.from({ length: 15 }, () => ({
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      size: Math.random() * 4 + 2,
-      delay: Math.random() * 5,
-    }))
-  );
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.15,
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    }),
+  // Arrow keys / Home / End move between milestones
+  const onTimelineKeyDown = (e) => {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[
+      e.key
+    ];
+    let target;
+    if (step) target = activeIndex + step;
+    else if (e.key === "Home") target = 0;
+    else if (e.key === "End") target = experiences.length - 1;
+    else return;
+    e.preventDefault();
+    const next = goTo(target);
+    btnRefs.current[experiences[next].id]?.focus({ preventScroll: true });
   };
 
-  const renderExperienceCard = (exp, index) => (
-    <motion.div
-      key={exp.id}
-      custom={index}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={cardVariants}
-      style={{ width: "100%" }}
-    >
-      <Paper
-        elevation={activeIndex === exp.id ? 6 : 3}
-        sx={{
-          p: { xs: 2, sm: 3 },
-          borderRadius: "12px",
-          backgroundColor: "#ffffff",
-          cursor: "pointer",
-          transform: activeIndex === exp.id ? "scale(1.02)" : "scale(1)",
-          transition: "all 0.3s ease",
-          borderLeft: `4px solid ${
-            activeIndex === exp.id ? "#2196F3" : "transparent"
-          }`,
-          "&:hover": {
-            transform: "scale(1.02)",
-            boxShadow: 6,
-          },
-          width: "100%",
-          maxWidth: "100%",
-          overflow: "hidden",
-        }}
-        onClick={() => setActiveIndex(exp.id)}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <Avatar
-            src={exp.image}
-            alt={exp.place}
-            sx={{
-              width: { xs: 48, sm: 60 },
-              height: { xs: 48, sm: 60 },
-              mr: 2,
-              border: `2px solid #2196F3`,
-            }}
-          />
-          <Box sx={{ overflow: "hidden" }}>
-            <Typography
-              variant="h6"
-              sx={{
-                color: "#000000",
-                fontWeight: 700,
-                mb: 0.5,
-                lineHeight: 1.2,
-                fontSize: { xs: "1rem", sm: "1.25rem" },
-              }}
-            >
-              {exp.place}
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: "#2196F3",
-                fontWeight: 600,
-                fontSize: { xs: "0.875rem", sm: "1rem" },
-              }}
-            >
-              {exp.title}
-            </Typography>
-          </Box>
-        </Box>
-
-        <Typography
-          variant="caption"
-          sx={{
-            display: "block",
-            color: theme.palette.grey[700],
-            mb: 2,
-            fontWeight: 500,
-            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-          }}
-        >
-          {exp.date}
-        </Typography>
-
-        <Box
-          component="ul"
-          sx={{
-            pl: 0,
-            mb: 0,
-            listStyleType: "none",
-            "& li": {
-              color: "#000000",
-              mb: 1,
-              position: "relative",
-              pl: "20px",
-              fontSize: { xs: "0.875rem", sm: "1rem" },
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                left: 0,
-                top: "10px",
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                backgroundColor: "#2196F3",
-              },
-            },
-          }}
-        >
-          {exp.description.map((desc, i) => (
-            <motion.li
-              key={i}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{
-                opacity: 1,
-                x: 0,
-                transition: {
-                  delay: i * 0.1 + index * 0.05,
-                },
-              }}
-            >
-              <Typography variant="body2" component="span">
-                {desc}
-              </Typography>
-            </motion.li>
-          ))}
-        </Box>
-      </Paper>
-    </motion.div>
-  );
+  const onCardDragEnd = (_, info) => {
+    if (info.offset.x < -70 || info.velocity.x < -500) goTo(activeIndex + 1);
+    else if (info.offset.x > 70 || info.velocity.x > 500) goTo(activeIndex - 1);
+  };
 
   return (
-    <Box
-      component="section"
-      id="education"
-      ref={ref}
-      sx={{
-        position: "relative",
-        py: { xs: 6, sm: 8, md: 12 },
-        px: { xs: 1, sm: 2, md: 6 },
-        color: "#ffffff",
-        overflow: "hidden",
-        minWidth: "300px",
-      }}
-    >
-      <motion.div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-          zIndex: 1,
-        }}
-      >
-        {particles.map((particle, index) => (
-          <motion.div
-            key={index}
-            style={{
-              position: "absolute",
-              width: particle.size,
-              height: particle.size,
-              background: "rgba(255, 255, 255, 0.6)",
-              borderRadius: "50%",
-              filter: "blur(1px)",
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-            }}
-            animate={{
-              y: ["0%", "-10%", "0%"],
-              transition: {
-                duration: 5 + particle.delay,
-                repeat: Infinity,
-                ease: "easeInOut",
-              },
-            }}
-          />
-        ))}
-      </motion.div>
-      <Box
-        sx={{
-          position: "relative",
-          zIndex: 1,
-          maxWidth: "1400px",
-          margin: "0 auto",
-          width: "100%",
-          px: { xs: 1, sm: 2 },
-        }}
-      >
-        <Box sx={{ mb: { xs: 4, sm: 6, md: 8 }, pl: { xs: 1, sm: 2, md: 0 } }}>
-          <TypewriterTitle />
-        </Box>
+    <div className="exp" ref={ref} aria-labelledby="experience-heading">
+      <div className="exp__glow exp__glow--1" aria-hidden="true" />
+      <div className="exp__glow exp__glow--2" aria-hidden="true" />
 
-        {isMobile ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              width: "100%",
-              px: { xs: 1, sm: 0 },
-            }}
+      <div className="exp__inner">
+        {/* ── Section Header ───────────────────────────── */}
+        <motion.div
+          className="exp__header"
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="eyebrow-wrap">
+            <span className="eyebrow-line" aria-hidden="true" />
+            <p className="eyebrow">Milestones &amp; Journey</p>
+          </div>
+          <h2 id="experience-heading" className="section-heading">
+            Experience &amp; <span className="accent">Education</span>
+          </h2>
+          <p className="exp__header-sub">
+            Chronological evolution of my engineering career, research
+            contributions, and leadership awards.
+          </p>
+        </motion.div>
+
+        {/* ── Interactive Layout ───────────────────────── */}
+        <div className="exp__layout">
+          {/* Timeline navigation sidebar */}
+          <div
+            className="exp__sidebar"
+            data-edge-left={edges.left ? "true" : "false"}
+            data-edge-right={edges.right ? "true" : "false"}
           >
-            {experiences.map((exp, index) => renderExperienceCard(exp, index))}
-          </Box>
-        ) : (
-          <Timeline
-            position="right"
-            sx={{
-              p: 0,
-              m: 0,
-              width: "100%",
-              "& .MuiTimelineItem-root:before": {
-                flex: 0,
-                padding: 0,
-              },
-            }}
-          >
-            {experiences.map((exp, index) => (
-              <TimelineItem key={exp.id} sx={{ minHeight: "200px" }}>
-                <TimelineSeparator>
-                  <TimelineDot
-                    sx={{
-                      backgroundColor:
-                        activeIndex === exp.id
-                          ? "#2196F3"
-                          : theme.palette.grey[600],
-                      width: 24,
-                      height: 24,
-                      p: 0,
-                      overflow: "hidden",
-                      border: `2px solid ${theme.palette.background.paper}`,
-                      boxShadow:
-                        activeIndex === exp.id
-                          ? `0 0 0 4px ${theme.palette.primary.light}`
-                          : "none",
-                      transition: "all 0.3s ease",
+            <div className="exp__line-track" aria-hidden="true">
+              <div className="exp__line-beam" />
+            </div>
+
+            <ul
+              className="exp__timeline"
+              ref={listRef}
+              onKeyDown={onTimelineKeyDown}
+              aria-label="Career Milestones"
+            >
+              {experiences.map((entry, i) => {
+                const isCurrent = active === entry.id;
+
+                return (
+                  <motion.li
+                    key={entry.id}
+                    initial={{ opacity: 0, x: -24 }}
+                    animate={inView ? { opacity: 1, x: 0 } : {}}
+                    transition={{
+                      delay: i * 0.08,
+                      duration: 0.5,
+                      ease: [0.22, 1, 0.36, 1],
                     }}
-                    onClick={() => setActiveIndex(exp.id)}
                   >
-                    <Avatar
-                      src={exp.image}
-                      alt={exp.place}
-                      sx={{
-                        width: "100%",
-                        height: "100%",
-                        filter:
-                          activeIndex === exp.id ? "none" : "grayscale(70%)",
+                    <button
+                      ref={(el) => {
+                        btnRefs.current[entry.id] = el;
                       }}
-                    />
-                  </TimelineDot>
-                  {index < experiences.length - 1 && (
-                    <TimelineConnector
-                      sx={{
-                        bgcolor:
-                          activeIndex === exp.id
-                            ? "#2196F3"
-                            : theme.palette.grey[600],
-                        width: "2px",
-                        flexGrow: 1,
-                        transition: "all 0.3s ease",
-                      }}
-                    />
-                  )}
-                </TimelineSeparator>
+                      className={`exp__item-btn ${isCurrent ? "exp__item-btn--active" : ""}`}
+                      onClick={() => setActive(entry.id)}
+                      aria-pressed={isCurrent}
+                      aria-label={`${entry.place} - ${entry.title}`}
+                    >
+                      {/* Interactive dot indicator */}
+                      <span className="exp__dot-wrap" aria-hidden="true">
+                        <span className="exp__dot" />
+                        {isCurrent && (
+                          <motion.span
+                            layoutId="activeDotRing"
+                            className="exp__dot-ring"
+                            transition={{
+                              type: "spring",
+                              stiffness: 350,
+                              damping: 28,
+                            }}
+                          />
+                        )}
+                      </span>
 
-                <TimelineContent sx={{ py: 2, px: { xs: 1, md: 3 } }}>
-                  {renderExperienceCard(exp, index)}
-                </TimelineContent>
-              </TimelineItem>
-            ))}
-          </Timeline>
-        )}
-      </Box>
-    </Box>
+                      {/* Info preview */}
+                      <div className="exp__item-info">
+                        <div className="exp__item-logo-wrap">
+                          <img
+                            src={entry.logo}
+                            alt={entry.place}
+                            className="exp__item-logo"
+                          />
+                        </div>
+                        <div className="exp__item-meta">
+                          <span className="exp__item-place">{entry.place}</span>
+                          <span className="exp__item-date">
+                            <FaCalendarAlt className="exp__date-icon" />{" "}
+                            {entry.date}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  </motion.li>
+                );
+              })}
+            </ul>
+
+            {/* Small screens: previous / next + position counter */}
+            <div className="exp__mobile-nav">
+              <button
+                type="button"
+                className="exp__nav-btn"
+                onClick={() => goTo(activeIndex - 1)}
+                disabled={activeIndex === 0}
+                aria-label="Previous milestone"
+              >
+                <FaChevronLeft />
+              </button>
+              <span className="exp__nav-count" aria-live="polite">
+                {activeIndex + 1} / {experiences.length}
+              </span>
+              <button
+                type="button"
+                className="exp__nav-btn"
+                onClick={() => goTo(activeIndex + 1)}
+                disabled={activeIndex === experiences.length - 1}
+                aria-label="Next milestone"
+              >
+                <FaChevronRight />
+              </button>
+            </div>
+          </div>
+
+          {/* Detailed view panel */}
+          <div className="exp__content-pane">
+            <AnimatePresence mode="wait">
+              {activeEntry && (
+                <motion.div
+                  key={activeEntry.id}
+                  className="exp__card"
+                  initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.98 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  drag={compact ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.18}
+                  onDragEnd={onCardDragEnd}
+                >
+                  <div className="exp__card-header">
+                    <div className="exp__card-logo-box">
+                      <img
+                        src={activeEntry.logo}
+                        alt={activeEntry.place}
+                        className="exp__card-logo"
+                      />
+                    </div>
+
+                    <div className="exp__card-title-group">
+                      <div
+                        className="exp__card-type-badge"
+                        style={{ color: TYPE_CONFIG[activeEntry.type]?.color }}
+                      >
+                        {TYPE_CONFIG[activeEntry.type]?.icon}
+                        <span>{TYPE_CONFIG[activeEntry.type]?.label}</span>
+                      </div>
+
+                      <h3 className="exp__card-role">{activeEntry.title}</h3>
+                      <div className="exp__card-place-date">
+                        <span className="exp__card-place">
+                          {activeEntry.place}
+                        </span>
+                        <span className="exp__card-sep">•</span>
+                        <span className="exp__card-date">
+                          {activeEntry.date}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="exp__card-divider" />
+
+                  {/* Bullet points */}
+                  <ul className="exp__card-desc-list">
+                    {activeEntry.description.map((point, index) => (
+                      <motion.li
+                        key={index}
+                        className="exp__card-desc-item"
+                        initial={{ opacity: 0, x: 16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.08, duration: 0.35 }}
+                      >
+                        <span className="exp__desc-bullet" aria-hidden="true">
+                          <FaCheckCircle className="exp__bullet-icon" />
+                        </span>
+                        <span className="exp__desc-text">{point}</span>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-};
-
-export default Education;
+}

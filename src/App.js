@@ -1,207 +1,211 @@
-import { useState, useEffect, useCallback } from "react";
-import { Box, CssBaseline, useScrollTrigger, Fab, Fade } from "@mui/material";
-import { KeyboardArrowUp } from "@mui/icons-material";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider } from "./context/ThemeContext";
+import Navbar from "./navBar/Navbar";
 import Header from "./header/header";
 import AboutMe from "./about-me/aboutMe";
 import Education from "./education/education";
 import Skills from "./skills/skills";
 import Cert from "./certifications/cert";
+import Projects from "./sections/Projects";
+import Contact from "./sections/Contact";
 import Footer from "./footer/footer";
-import PreLoader from "./pre_loader/pre_loader";
-import Navbar from "./navBar/Navbar";
+import Loader from "./loader/Loader";
+import "./global.css";
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger);
+/* ══════════════════════════════════════════════════════════
+   CUSTOM CURSOR
+══════════════════════════════════════════════════════════ */
+function CustomCursor() {
+  const dotRef = useRef(null);
+  const ringRef = useRef(null);
+  const pos = useRef({ x: -100, y: -100 });
+  const ring = useRef({ x: -100, y: -100 });
+  const raf = useRef(null);
 
-function ScrollTop({ children }) {
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 100,
-  });
-
-  const handleClick = (event) => {
-    const anchor = (event.target.ownerDocument || document).querySelector(
-      "#header"
-    );
-    if (anchor) {
-      anchor.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  };
-
-  return (
-    <Fade in={trigger}>
-      <Box
-        onClick={handleClick}
-        role="presentation"
-        sx={{ position: "fixed", bottom: 32, right: 32, zIndex: 1000 }}
-      >
-        {children}
-      </Box>
-    </Fade>
-  );
-}
-
-function App() {
-  const [activeSection, setActiveSection] = useState("");
-  const [showPage, setShowPage] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-
-  // Initialize animations and scroll effects
-  // Replace your current GSAP initialization with this optimized version
   useEffect(() => {
-    if (!showPage) return;
-
-    // Batch all animations together
-    gsap.registerEffect({
-      name: "fadeUp",
-      effect: (targets) => {
-        return gsap.from(targets, {
-          opacity: 0,
-          y: 50,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power2.out",
-        });
-      },
-      defaults: { duration: 0.8 },
-      extendTimeline: true,
-    });
-
-    // Create a single timeline for all scroll animations
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "main",
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 0.5,
-      },
-    });
-
-    // Add all animations to the timeline
-    tl.fadeUp("[data-scroll]", 0.1);
-
-    // Simplified section detection
-    const sections = gsap.utils.toArray("section");
-    sections.forEach((section) => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: "top center",
-        end: "bottom center",
-        onEnter: () => setActiveSection(section.id),
-        onEnterBack: () => setActiveSection(section.id),
-        markers: false,
-      });
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-      tl.kill();
+    const onMove = (e) => {
+      pos.current = { x: e.clientX, y: e.clientY };
     };
-  }, [showPage]);
+    const onOver = (e) => {
+      const target = e.target.closest(
+        'a, button, [role="button"], input, textarea, label',
+      );
+      if (target) document.body.classList.add("cursor-hover");
+      else document.body.classList.remove("cursor-hover");
+    };
 
-  // Loading simulation
-  useEffect(() => {
-    const loadInterval = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(loadInterval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 300);
+    window.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("mouseover", onOver, { passive: true });
 
-    const timeoutId = setTimeout(() => {
-      setShowPage(true);
-      document.body.classList.add("loaded");
-    }, 4000);
+    const tick = () => {
+      if (dotRef.current) {
+        dotRef.current.style.left = `${pos.current.x}px`;
+        dotRef.current.style.top = `${pos.current.y}px`;
+      }
+      if (ringRef.current) {
+        ring.current.x += (pos.current.x - ring.current.x) * 0.12;
+        ring.current.y += (pos.current.y - ring.current.y) * 0.12;
+        ringRef.current.style.left = `${ring.current.x}px`;
+        ringRef.current.style.top = `${ring.current.y}px`;
+      }
+      raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
 
     return () => {
-      clearInterval(loadInterval);
-      clearTimeout(timeoutId);
+      window.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseover", onOver);
+      cancelAnimationFrame(raf.current);
     };
   }, []);
 
   return (
     <>
-      <CssBaseline />
-      <AnimatePresence>
-        {!showPage ? (
-          <PreLoader progress={loadingProgress} />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100vh",
-              background:
-                "linear-gradient(to bottom, #00081a 0%, #000000 100%)",
-              color: "common.white",
-              position: "relative",
-              overflowX: "hidden",
-              willChange: "transform",
-              backfaceVisibility: "hidden",
-            }}
-          >
-            <Navbar
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-            />
-
-            <Box
-              component="main"
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                pt: { xs: "56px", md: "64px" }, // Add padding to account for fixed navbar
-              }}
-            >
-              <section id="header">
-                <Header />
-              </section>
-
-              <Box
-                sx={{
-                  pt: { xs: 8, md: 10 },
-                  flex: 1,
-                }}
-              >
-                <section id="aboutMe">
-                  <AboutMe />
-                </section>
-
-                <section id="experience">
-                  <Education />
-                </section>
-
-                <section id="skills">
-                  <Skills />
-                </section>
-
-                <section id="certification">
-                  <Cert />
-                </section>
-              </Box>
-            </Box>
-
-            <Box component="footer" sx={{ mt: "auto" }}>
-              <Footer />
-            </Box>
-
-            <ScrollTop>
-              <Fab size="medium" aria-label="scroll back to top">
-                <KeyboardArrowUp />
-              </Fab>
-            </ScrollTop>
-          </Box>
-        )}
-      </AnimatePresence>
+      <div id="cursor-dot" ref={dotRef} aria-hidden="true" />
+      <div id="cursor-ring" ref={ringRef} aria-hidden="true" />
     </>
   );
 }
 
-export default App;
+/* ══════════════════════════════════════════════════════════
+   SCROLL-TO-TOP
+══════════════════════════════════════════════════════════ */
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          className="scroll-top-btn"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Scroll to top"
+          initial={{ opacity: 0, scale: 0.5, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.5, y: 20 }}
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          ↑
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   APP ROOT
+
+   loading   → <Loader /> plays; the site is NOT mounted yet, so the
+               main thread is free and every animation stays smooth.
+   revealing → the loader's curtain opens (pure CSS, GPU) and the site
+               mounts underneath it, so its entrance animations play
+               as the curtain parts.
+   done      → loader is removed, scrolling is unlocked.
+══════════════════════════════════════════════════════════ */
+const defer = React.startTransition || ((fn) => fn());
+
+function AppInner() {
+  const [phase, setPhase] = useState("loading");
+
+  const handleReveal = useCallback(() => {
+    defer(() => setPhase((p) => (p === "loading" ? "revealing" : p)));
+  }, []);
+  const handleDone = useCallback(() => setPhase("done"), []);
+
+  useEffect(() => {
+    document.body.style.overflow = phase === "done" ? "" : "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [phase]);
+
+  return (
+    <>
+      <CustomCursor />
+
+      {phase !== "loading" && (
+        <div key="main">
+          <Navbar />
+          <main>
+            <section id="home" aria-labelledby="hero-heading">
+              {" "}
+              <Header />{" "}
+            </section>
+            <section id="about" aria-labelledby="about-heading">
+              {" "}
+              <AboutMe />{" "}
+            </section>
+            <section id="projects" aria-labelledby="projects-heading">
+              <Projects />{" "}
+            </section>
+            <section id="experience" aria-labelledby="experience-heading">
+              <Education />
+            </section>
+            <section id="skills" aria-labelledby="skills-heading">
+              {" "}
+              <Skills />{" "}
+            </section>
+            <section id="achievements" aria-labelledby="achievements-heading">
+              <Cert />
+            </section>
+            <section id="contact" aria-labelledby="contact-heading">
+              <Contact />{" "}
+            </section>
+          </main>
+          <Footer />
+          <ScrollToTop />
+        </div>
+      )}
+
+      {phase !== "done" && (
+        <Loader onReveal={handleReveal} onDone={handleDone} />
+      )}
+
+      <style>{`
+        /* ════════════════════════════════════════════════════
+           SCROLL-TO-TOP BUTTON
+        ════════════════════════════════════════════════════ */
+        .scroll-top-btn {
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          width: 46px;
+          height: 46px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--purple-500, #8B5CF6), var(--purple-deep, #5B21B6));
+          color: #fff;
+          font-size: 1.1rem;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;
+          z-index: 900;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+        }
+        .scroll-top-btn:focus-visible {
+          outline: 2px solid #C4B5FD;
+          outline-offset: 3px;
+        }
+      `}</style>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <CssBaseline />
+      <AppInner />
+    </ThemeProvider>
+  );
+}

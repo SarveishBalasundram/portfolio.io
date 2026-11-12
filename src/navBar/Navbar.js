@@ -1,312 +1,263 @@
-import { useState, useEffect, useCallback } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Box,
-  IconButton,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaBars, FaTimes, FaSun, FaMoon } from 'react-icons/fa';
+import { useTheme } from '../context/ThemeContext';
+import sbLogo from '../SB_Logo.png';
+import './Navbar.css';
 
-const Navbar = ({ activeSection, setActiveSection }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [scrolled, setScrolled] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+const NAV_LINKS = [
+  { id: 'home',         label: 'Home' },
+  { id: 'about',        label: 'About' },
+  { id: 'projects',     label: 'Projects' },
+  { id: 'experience',   label: 'Experience' },
+  { id: 'skills',       label: 'Skills' },
+  { id: 'achievements', label: 'Achievements' },
+  { id: 'contact',      label: 'Contact' },
+];
 
-  const throttle = (func, limit) => {
-    let lastFunc;
-    let lastRan;
-    return function () {
-      const context = this;
-      const args = arguments;
-      if (!lastRan) {
-        func.apply(context, args);
-        lastRan = Date.now();
-      } else {
-        clearTimeout(lastFunc);
-        lastFunc = setTimeout(function () {
-          if (Date.now() - lastRan >= limit) {
-            func.apply(context, args);
-            lastRan = Date.now();
-          }
-        }, limit - (Date.now() - lastRan));
-      }
-    };
-  };
-  const navLinks = [
-    { id: 1, name: "Home", href: "#header" },
-    { id: 2, name: "About Me", href: "#aboutMe" },
-    { id: 3, name: "Experiences", href: "#experience" },
-    { id: 4, name: "Skills", href: "#skills" },
-    { id: 5, name: "Certifications", href: "#certification" },
-  ];
-
-  const handleScroll = useCallback(() => {
-    setScrolled(window.scrollY > 10);
-
-    const scrollPosition = window.scrollY + window.innerHeight * 0.3;
-    const sections = Array.from(document.querySelectorAll("section"));
-
-    // Find the section that's most centered in viewport
-    let closestSection = null;
-    let smallestDistance = Infinity;
-
-    sections.forEach((section) => {
-      const rect = section.getBoundingClientRect();
-      const sectionCenter = rect.top + rect.height / 2 + window.scrollY;
-      const distance = Math.abs(scrollPosition - sectionCenter);
-
-      if (distance < smallestDistance) {
-        smallestDistance = distance;
-        closestSection = section.id;
-      }
-    });
-
-    // Special case for aboutMe when near threshold
-    if (
-      closestSection === "aboutMe" &&
-      scrollPosition >= 818 &&
-      scrollPosition <= 1583
-    ) {
-      console.log(`Forcing aboutMe activation at scroll: ${scrollPosition}`);
-      closestSection = "aboutMe";
-    }
-
-    if (closestSection && closestSection !== activeSection) {
-      console.log(`Updating active section to: ${closestSection}`);
-      setActiveSection(closestSection);
-    }
-  }, [activeSection, setActiveSection]);
-
-  useEffect(() => {
-    const throttledScroll = throttle(handleScroll, 100);
-    window.addEventListener("scroll", throttledScroll);
-    return () => window.removeEventListener("scroll", throttledScroll);
-  }, [handleScroll]);
-
-  const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: (i) => ({
-      y: 0,
-      opacity: 1,
-      transition: {
-        delay: i * 0.1,
-        type: "spring",
-        stiffness: 100,
-        damping: 10,
-      },
-    }),
-  };
-
-  const underlineVariants = {
-    hidden: { scaleX: 0, originX: 0 },
-    visible: {
-      scaleX: 1,
-      originX: 0,
-      transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] },
-    },
-    hover: { scaleX: 1, originX: 0 },
-  };
+/* ── Theme Toggle Pill ──────────────────────────────────────── */
+function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
-    <AppBar
-      position="fixed"
-      elevation={0}
-      sx={{
-        backgroundColor: scrolled
-          ? "rgba(0, 8, 26, 0.9)"
-          : "rgba(0, 8, 26, 0.7)",
-        backdropFilter: "blur(10px)",
-        transition: "all 0.4s ease",
-        boxShadow: scrolled ? "0 4px 20px rgba(0, 0, 0, 0.2)" : "none",
-      }}
+    <button
+      className="theme-toggle"
+      onClick={toggleTheme}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDark ? 'Light mode' : 'Dark mode'}
     >
-      <Toolbar
-        sx={{
-          maxWidth: "1200px",
-          width: "100%",
-          mx: "auto",
-          px: { xs: 2, md: 4 },
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Desktop Navigation */}
-        <Box
-          sx={{
-            display: { xs: "none", md: "flex" },
-            gap: 4,
-          }}
-        >
-          {navLinks.map((link) => (
-            <Box
-              component="a"
-              href={link.href}
-              key={link.id}
-              sx={{
-                color:
-                  activeSection === link.href.substring(1)
-                    ? "#ff4081"
-                    : "common.white",
-                textDecoration: "none",
-                position: "relative",
-                px: 1,
-                py: 2,
-                fontWeight: 500,
-                fontSize: "1rem",
-                "&:hover": {
-                  color: "#ff4081",
-                },
-              }}
-            >
-              {link.name}
-              {activeSection === link.href.substring(1) && (
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  variants={underlineVariants}
-                  style={{
-                    position: "absolute",
-                    bottom: 8,
-                    left: 0,
-                    right: 0,
-                    height: "2px",
-                    backgroundColor: "#ff4081",
-                    transformOrigin: "left center",
-                  }}
-                />
-              )}
-              <motion.div
-                initial={{ scaleX: 0 }}
-                whileHover={{ scaleX: 1 }}
-                transition={{ duration: 0.3 }}
-                style={{
-                  position: "absolute",
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  height: "2px",
-                  backgroundColor: "#ff4081",
-                  transformOrigin: "left center",
-                }}
-              />
-            </Box>
-          ))}
-        </Box>
-
-        {/* Mobile Menu Button */}
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="end"
-          onClick={handleDrawerToggle}
-          sx={{
-            display: { md: "none" },
-            color: "common.white",
-          }}
-        >
-          {drawerOpen ? <CloseIcon /> : <MenuIcon />}
-        </IconButton>
-
-        {/* Mobile Drawer */}
-        <Drawer
-          anchor="right"
-          open={drawerOpen}
-          onClose={handleDrawerToggle}
-          PaperProps={{
-            sx: {
-              width: "70%",
-              maxWidth: "300px",
-              backgroundColor: "rgba(0, 18, 32, 0.98)",
-              backdropFilter: "blur(10px)",
-              color: "common.white",
-            },
-          }}
-        >
-          <Box
-            sx={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              py: 2,
-            }}
-          >
-            <Box
-              sx={{
-                px: 2,
-                py: 1,
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
-              <IconButton onClick={handleDrawerToggle} color="inherit">
-                <CloseIcon />
-              </IconButton>
-            </Box>
-            <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.12)" }} />
-            <List>
-              {navLinks.map((link) => (
-                <ListItem
-                  button
-                  component="a"
-                  href={link.href}
-                  onClick={handleDrawerToggle}
-                  key={link.id}
-                  sx={{
-                    py: 2,
-                    color:
-                      activeSection === link.href.substring(1)
-                        ? "#ff4081"
-                        : "common.white",
-                    "&:hover": {
-                      backgroundColor: "rgba(255, 255, 255, 0.08)",
-                      color: "#ff4081",
-                    },
-                    position: "relative",
-                  }}
-                >
-                  <ListItemText
-                    primary={link.name}
-                    primaryTypographyProps={{
-                      fontWeight: 500,
-                      fontSize: "1.1rem",
-                    }}
-                  />
-                  {activeSection === link.href.substring(1) && (
-                    <motion.div
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.5 }}
-                      style={{
-                        position: "absolute",
-                        bottom: 8,
-                        left: 16,
-                        right: 16,
-                        height: "2px",
-                        backgroundColor: "#ff4081",
-                        transformOrigin: "left center",
-                      }}
-                    />
-                  )}
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        </Drawer>
-      </Toolbar>
-    </AppBar>
+      <div className="theme-toggle__track">
+        <motion.div
+          className="theme-toggle__thumb"
+          animate={{ x: isDark ? 0 : 24 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 32 }}
+        />
+        <span className="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+          <FaMoon />
+        </span>
+        <span className="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+          <FaSun />
+        </span>
+      </div>
+    </button>
   );
-};
+}
 
-export default Navbar;
+export default function Navbar() {
+  const [scrolled,       setScrolled]       = useState(false);
+  const [drawerOpen,     setDrawerOpen]     = useState(false);
+  const [activeSection,  setActiveSection]  = useState('home');
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const drawerRef  = useRef(null);
+  const menuBtnRef = useRef(null);
+
+  /* ── Scroll: transparency + progress bar ─────────────── */
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+      const docH = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(docH > 0 ? window.scrollY / docH : 0);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  /* ── Active section via IntersectionObserver ─────────── */
+  useEffect(() => {
+    const ids = NAV_LINKS.map(l => l.id);
+
+    const observer = new IntersectionObserver((entries) => {
+      // Find the most prominent intersecting section
+      const intersecting = entries.filter(e => e.isIntersecting);
+      if (intersecting.length > 0) {
+        intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
+        setActiveSection(intersecting[0].target.id);
+      }
+    }, {
+      rootMargin: '-20% 0px -40% 0px',
+      threshold: [0, 0.2, 0.5]
+    });
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  /* ── Close drawer on Escape ──────────────────────────── */
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') { setDrawerOpen(false); menuBtnRef.current?.focus(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [drawerOpen]);
+
+  /* ── Lock body scroll when drawer open ──────────────── */
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [drawerOpen]);
+
+  const handleNavClick = useCallback((id) => {
+    setDrawerOpen(false);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    menuBtnRef.current?.focus();
+  }, []);
+
+  return (
+    <>
+      {/* ── Scroll progress bar ─────────────────────────── */}
+      <div
+        className="nav-progress"
+        style={{ transform: `scaleX(${scrollProgress})` }}
+        aria-hidden="true"
+      />
+
+      {/* ── AppBar ──────────────────────────────────────── */}
+      <header
+        className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}
+        role="banner"
+      >
+        <div className="navbar__inner">
+          {/* SB Monogram Logo */}
+          <motion.a
+            href="#home"
+            className="navbar__logo"
+            onClick={(e) => { e.preventDefault(); handleNavClick('home'); }}
+            aria-label="Sarveish Balasundram — Go to top"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          >
+            <img
+              src={sbLogo}
+              alt="SB Monogram"
+              className="navbar__logo-img"
+            />
+          </motion.a>
+
+          {/* Desktop links */}
+          <nav className="navbar__links" aria-label="Main navigation">
+            {NAV_LINKS.map(link => (
+              <a
+                key={link.id}
+                href={`#${link.id}`}
+                className={`navbar__link ${activeSection === link.id ? 'navbar__link--active' : ''}`}
+                onClick={(e) => { e.preventDefault(); handleNavClick(link.id); }}
+                aria-current={activeSection === link.id ? 'page' : undefined}
+              >
+                {link.label}
+                {activeSection === link.id && (
+                  <motion.span
+                    className="navbar__link-indicator"
+                    layoutId="nav-indicator"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    aria-hidden="true"
+                  />
+                )}
+              </a>
+            ))}
+          </nav>
+
+          {/* Right-side controls */}
+          <div className="navbar__controls">
+            <ThemeToggle />
+
+            <a
+              href="#contact"
+              className="navbar__cta"
+              onClick={(e) => { e.preventDefault(); handleNavClick('contact'); }}
+            >
+              Let's Talk
+            </a>
+
+            {/* Mobile burger */}
+            <button
+              ref={menuBtnRef}
+              className="navbar__burger"
+              onClick={() => setDrawerOpen(o => !o)}
+              aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={drawerOpen}
+              aria-controls="mobile-drawer"
+            >
+              {drawerOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Mobile drawer ───────────────────────────────── */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            <motion.div
+              className="drawer-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setDrawerOpen(false)}
+              aria-hidden="true"
+            />
+            <motion.nav
+              id="mobile-drawer"
+              ref={drawerRef}
+              className="drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile navigation"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            >
+              <div className="drawer__header">
+                <img src={sbLogo} alt="SB" className="drawer__logo" />
+                <button
+                  className="drawer__close"
+                  onClick={() => { setDrawerOpen(false); menuBtnRef.current?.focus(); }}
+                  aria-label="Close menu"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+
+              <ul className="drawer__list">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.li
+                    key={link.id}
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05, duration: 0.3 }}
+                  >
+                    <a
+                      href={`#${link.id}`}
+                      className={`drawer__link ${activeSection === link.id ? 'drawer__link--active' : ''}`}
+                      onClick={(e) => { e.preventDefault(); handleNavClick(link.id); }}
+                      aria-current={activeSection === link.id ? 'page' : undefined}
+                    >
+                      {link.label}
+                    </a>
+                  </motion.li>
+                ))}
+              </ul>
+
+              {/* Theme toggle inside drawer */}
+              <div className="drawer__footer">
+                <ThemeToggle />
+                <span className="drawer__theme-label">Toggle Theme</span>
+              </div>
+            </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

@@ -1,0 +1,154 @@
+/* ============================================================
+   DESIGN TOKENS — Portfolio 2.0
+   Purple / Black identity — single source of truth
+   Both dark (default) and light theme defined here.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── DARK THEME (default) ───────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary:    #08060D;
+  --bg-secondary:  #0E0A16;
+  --surface-1:     #151020;
+  --surface-2:     #1B1429;
+  --surface-glass: rgba(23, 16, 36, 0.72);
+
+  /* Borders */
+  --border-subtle: rgba(196, 181, 253, 0.12);
+  --border-strong: rgba(167, 139, 250, 0.34);
+
+  /* Purple palette */
+  --purple-500: #8B5CF6;
+  --purple-400: #A78BFA;
+  --purple-300: #C4B5FD;
+  --purple-deep: #5B21B6;
+
+  /* Text */
+  --text-primary:   #F5F3FA;
+  --text-secondary: #B8B0C7;
+  --text-muted:     #898197;
+
+  /* Status / focus */
+  --success:    #86D6B0;
+  --focus-ring: #C4B5FD;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
+  --shadow-purple: 0 0 24px rgba(139, 92, 246, 0.25);
+  --shadow-purple-strong: 0 0 40px rgba(139, 92, 246, 0.45);
+
+  /* Navbar scrolled bg */
+  --nav-scrolled-bg: rgba(8, 6, 13, 0.92);
+
+  /* Scrollbar */
+  --scrollbar-thumb: #1B1429;
+
+  /* Gold accent (identity only) */
+  --gold: #D4AF37;
+  --gold-glow: rgba(212, 175, 55, 0.4);
+}
+
+/* ── LIGHT THEME ────────────────────────────────────────────── */
+[data-theme="light"] {
+  /* Backgrounds — crisp, luminous, airy lavender-tinted pearl */
+  --bg-primary:    #FAF9FE;
+  --bg-secondary:  #F3EFFB;
+  --surface-1:     #FFFFFF;
+  --surface-2:     #F5F2FD;
+  --surface-glass: rgba(255, 255, 255, 0.88);
+
+  /* Borders */
+  --border-subtle: rgba(124, 58, 237, 0.12);
+  --border-strong: rgba(124, 58, 237, 0.28);
+
+  /* Purple palette */
+  --purple-500: #7C3AED;
+  --purple-400: #6D28D9;
+  --purple-300: #5B21B6;
+  --purple-deep: #4C1D95;
+
+  /* Text — high-contrast, razor sharp typography */
+  --text-primary:   #0F0A1C;
+  --text-secondary: #473B63;
+  --text-muted:     #796F8E;
+
+  /* Status / focus */
+  --success:    #059669;
+  --focus-ring: #7C3AED;
+
+  /* Shadows — soft ambient elevation with subtle violet depth */
+  --shadow-sm:  0 2px 6px rgba(30, 10, 60, 0.05);
+  --shadow-md:  0 6px 20px rgba(30, 10, 60, 0.08);
+  --shadow-lg:  0 16px 40px rgba(30, 10, 60, 0.12);
+  --shadow-purple: 0 4px 24px rgba(124, 58, 237, 0.14);
+  --shadow-purple-strong: 0 8px 32px rgba(124, 58, 237, 0.24);
+
+  /* Navbar scrolled bg */
+  --nav-scrolled-bg: rgba(250, 249, 254, 0.92);
+
+  /* Scrollbar */
+  --scrollbar-thumb: #DDD6FE;
+
+  /* Gold (same) */
+  --gold: #D4AF37;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+}
+
+/* ── Shared / unchanged tokens ──────────────────────────────── */
+:root {
+  /* Typography */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+
+  /* Type scale */
+  --text-hero:    clamp(2.8rem, 7vw, 6.5rem);
+  --text-h2:      clamp(2rem, 4vw, 3.5rem);
+  --text-h3:      clamp(1.4rem, 2.5vw, 2rem);
+  --text-card-h:  clamp(1.1rem, 1.5vw, 1.35rem);
+  --text-body:    clamp(1rem, 1.2vw, 1.125rem);
+  --text-sm:      0.9rem;
+  --text-xs:      0.8rem;
+
+  /* Spacing (8px base) */
+  --space-1:  0.5rem;
+  --space-2:  1rem;
+  --space-3:  1.5rem;
+  --space-4:  2rem;
+  --space-5:  2.5rem;
+  --space-6:  3rem;
+  --space-8:  4rem;
+  --space-10: 5rem;
+  --space-12: 6rem;
+  --space-16: 8rem;
+
+  /* Layout */
+  --container-max: 1240px;
+  --nav-height:    68px;
+  --radius-sm:   8px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-pill: 9999px;
+
+  /* Motion */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --dur-micro:   160ms;
+  --dur-hover:   220ms;
+  --dur-enter:   550ms;
+  --dur-reveal:  650ms;
+  --dur-theme:   350ms;
+}
+
+/* ── Reduced motion overrides ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,565 +1,183 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  styled,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import { motion, useAnimation, useInView } from "framer-motion";
-import { TypeAnimation } from "react-type-animation";
-import resume from "./resume.pdf";
-import sarveishImage from "./sarveish.png"; // Import your image file
-import { keyframes } from "@mui/system";
+import { useRef, useCallback } from 'react';
+import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { FaGraduationCap, FaMapMarkerAlt, FaLaptopCode, FaAward, FaDownload, FaPaperPlane } from 'react-icons/fa';
+import resume from './resume.pdf';
+import sarveishImage from './sarveish_new.jpg';
+import './aboutMe.css';
 
-const floatBackground = keyframes`
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(30px, 50px); }
-`;
+/* ── 3D Tilt Card ─────────────────────────────────────────────── */
+function TiltPortrait({ src, alt }) {
+  const cardRef = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
-const AboutSection = styled("section")(({ theme }) => ({
-  position: "relative",
-  minHeight: "100vh",
-  boxSizing: "border-box",
-  padding: theme.spacing(15, 2),
-  overflow: "visible",
-  color: "#ffffff",
-  zIndex: 1,
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [10, -10]), { stiffness: 240, damping: 25 });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-12, 12]), { stiffness: 240, damping: 25 });
 
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    pointerEvents: "none",
-    background: `
-      radial-gradient(circle at 20% 30%, rgba(198, 35, 104, 0.05) 0%, transparent 25%),
-      radial-gradient(circle at 80% 70%, rgba(0, 255, 255, 0.05) 0%, transparent 25%)
-    `,
-    zIndex: -1,
-    animation: `${floatBackground} 15s infinite alternate ease-in-out`,
-  },
-}));
+  const handleMouseMove = useCallback((e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width - 0.5;
+    const ny = (e.clientY - rect.top) / rect.height - 0.5;
+    x.set(nx);
+    y.set(ny);
+  }, [x, y]);
 
-const ContentContainer = styled(Box)(({ theme }) => ({
-  maxWidth: "1400px",
-  margin: "0 auto",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: theme.spacing(6),
-  [theme.breakpoints.down("md")]: {
-    flexDirection: "column",
-  },
-}));
-
-const TextContent = styled(Box)(({ theme }) => ({
-  flex: 1,
-  maxWidth: "600px",
-  zIndex: 2,
-}));
-
-const HighlightText = styled("span")(({ theme }) => ({
-  color: "#c62368",
-  fontWeight: "bold",
-  textShadow: "0 0 8px rgba(198, 35, 104, 0.5)",
-}));
-
-const ResumeButton = styled(Button)(({ theme }) => ({
-  background: "linear-gradient(45deg, #c62368 0%, #a61a58 100%)",
-  color: "white",
-  borderRadius: "50px",
-  padding: theme.spacing(1.5, 4),
-  fontWeight: 600,
-  boxShadow: "0 4px 15px rgba(198, 35, 104, 0.4)",
-  marginTop: theme.spacing(3),
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-3px)",
-    boxShadow: "0 6px 20px rgba(198, 35, 104, 0.6)",
-    background: "linear-gradient(45deg, #a61a58 0%, #851347 100%)",
-  },
-}));
-
-const PhotoContainer = ({ src }) => {
-  const controls = useAnimation();
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
-  const [isHovered, setIsHovered] = useState(false);
+  const handleMouseLeave = useCallback(() => {
+    x.set(0);
+    y.set(0);
+  }, [x, y]);
 
   return (
     <motion.div
-      ref={ref}
+      ref={cardRef}
+      className="about__photo-container"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       style={{
-        width: "400px",
-        height: "450px",
-        perspective: "1000px",
-        position: "relative",
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
       }}
-      initial={{ opacity: 0, rotateY: 90 }}
-      animate={
-        isInView
-          ? {
-              opacity: 1,
-              rotateY: 0,
-              transition: { delay: 0.3, duration: 0.8 },
-            }
-          : {}
-      }
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
     >
-      {/* 3D Card Container with Depth */}
+      <div className="about__photo-frame">
+        {/* Animated glowing border */}
+        <div className="about__photo-glow-border" aria-hidden="true" />
+        <div className="about__photo-inner">
+          <img src={src} alt={alt} className="about__photo" loading="lazy" />
+          <div className="about__photo-overlay" aria-hidden="true" />
+        </div>
+      </div>
+
+      {/* Floating status badge */}
       <motion.div
-        style={{
-          width: "100%",
-          height: "100%",
-          transformStyle: "preserve-3d",
-          position: "relative",
-        }}
-        animate={{
-          rotateX: isHovered ? 5 : 0,
-          rotateY: isHovered ? 5 : 0,
-          scale: isHovered ? 1.05 : 1,
-          transition: { type: "spring", stiffness: 300, damping: 20 },
-        }}
+        className="about__status-badge"
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
       >
-        {/* Front Face with Creative Image Styling */}
-        <motion.div
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            backfaceVisibility: "hidden",
-            borderRadius: "15px",
-            overflow: "hidden",
-            transform: "translateZ(20px)",
-            background: "linear-gradient(45deg, #00081a 0%, #000000 100%)",
-          }}
-        >
-          {/* Image with Duotone Effect and Glow */}
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "100%",
-              mixBlendMode: "lighten",
-              filter: "contrast(1.2) saturate(1.1)",
-              isolation: "isolate",
-            }}
-          >
-            <img
-              src={src}
-              alt="Profile"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                display: "block",
-                filter: `
-                  grayscale(30%) 
-                  contrast(120%) 
-                  drop-shadow(0 0 8px rgba(198, 35, 104, 0.7))
-                `,
-                maskImage:
-                  "linear-gradient(to bottom, black 80%, transparent 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(to bottom, black 80%, transparent 100%)",
-              }}
-            />
-
-            {/* Color Overlay */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                background:
-                  "linear-gradient(45deg, rgba(198, 35, 104, 0.15) 0%, rgba(0, 255, 255, 0.1) 100%)",
-                mixBlendMode: "color",
-              }}
-            />
-          </div>
-
-          {/* Glowing Border Animation */}
-          <motion.div
-            style={{
-              position: "absolute",
-              inset: 0,
-              border: "1px solid rgba(198, 35, 104, 0.3)",
-              borderRadius: "15px",
-              pointerEvents: "none",
-            }}
-            animate={{
-              boxShadow: [
-                "inset 0 0 10px rgba(198, 35, 104, 0.3), 0 0 15px rgba(198, 35, 104, 0.3)",
-                "inset 0 0 15px rgba(198, 35, 104, 0.5), 0 0 25px rgba(198, 35, 104, 0.5)",
-                "inset 0 0 10px rgba(198, 35, 104, 0.3), 0 0 15px rgba(198, 35, 104, 0.3)",
-              ],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-
-          {/* Floating Highlights */}
-          {Array.from({ length: 3 }).map((_, i) => (
-            <motion.div
-              key={i}
-              style={{
-                position: "absolute",
-                width: "100px",
-                height: "100px",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(198, 35, 104, 0.2) 0%, transparent 70%)",
-                filter: "blur(15px)",
-              }}
-              animate={{
-                x: [0, 20, 0],
-                y: [0, 30, 0],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 8 + i * 2,
-                repeat: Infinity,
-                delay: i * 1.5,
-              }}
-            />
-          ))}
-        </motion.div>
-
-        {/* Back Face with Holographic Effect */}
-        <motion.div
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            backfaceVisibility: "hidden",
-            borderRadius: "15px",
-            background: `
-              linear-gradient(135deg, 
-                rgba(0, 8, 26, 0.9) 0%, 
-                rgba(0, 0, 0, 0.9) 100%
-            `,
-            transform: "rotateY(180deg) translateZ(20px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
-          }}
-        >
-          {/* Holographic Pattern */}
-          <div
-            style={{
-              position: "absolute",
-              width: "200%",
-              height: "200%",
-              background: `
-              linear-gradient(45deg, 
-                rgba(198, 35, 104, 0.05) 25%, 
-                transparent 25%, 
-                transparent 50%, 
-                rgba(0, 255, 255, 0.05) 50%, 
-                rgba(0, 255, 255, 0.05) 75%, 
-                transparent 75%, 
-                transparent)
-            `,
-              backgroundSize: "20px 20px",
-              animation: "moveHologram 20s linear infinite",
-              opacity: 0.7,
-            }}
-          />
-
-          <Typography
-            variant="h6"
-            sx={{
-              color: "transparent",
-              textAlign: "center",
-              background: "linear-gradient(45deg, #c62368, #00ffff)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              textShadow: "0 0 10px rgba(198, 35, 104, 0.7)",
-              position: "relative",
-              zIndex: 2,
-              padding: "0.5rem 1rem",
-              borderRadius: "5px",
-            }}
-          >
-            Full Stack Developer
-          </Typography>
-        </motion.div>
+        <span className="about__status-dot" />
+        <span>Digital Business Analyst @ Hilti</span>
       </motion.div>
-
-      {/* CSS Animation for Hologram */}
-      <style>{`
-        @keyframes moveHologram {
-          0% { transform: translate(0, 0); }
-          100% { transform: translate(-50%, -50%); }
-        }
-      `}</style>
     </motion.div>
   );
-};
+}
 
-const AboutMe = () => {
-  console.log("Image path:", sarveishImage); // Should show the correct path
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const controls = useAnimation();
+const STATS = [
+  { icon: <FaLaptopCode />, label: 'Tech Stack', value: '25+ Skills' },
+  { icon: <FaAward />, label: 'Achievements', value: '8 Awards & Certs' },
+  { icon: <FaGraduationCap />, label: 'Degree', value: 'UTM First Class (3.99)' },
+];
+
+export default function AboutMe() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, amount: 0.3 });
-  const [particles] = useState(
-    Array.from({ length: 15 }, () => ({
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      size: Math.random() * 4 + 2,
-      delay: Math.random() * 5,
-    }))
-  );
-
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible");
-    } else {
-      controls.start("hidden");
-    }
-  }, [isInView, controls]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 10,
-      },
-    },
-  };
+  const inView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <AboutSection id="about" ref={ref}>
-      <motion.div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-          zIndex: 1,
-        }}
-      >
-        {particles.map((particle, index) => (
-          <motion.div
-            key={index}
-            style={{
-              position: "absolute",
-              width: particle.size,
-              height: particle.size,
-              background: "rgba(255, 255, 255, 0.6)",
-              borderRadius: "50%",
-              filter: "blur(1px)",
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-            }}
-            animate={{
-              y: ["0%", "-10%", "0%"],
-              transition: {
-                duration: 5 + particle.delay,
-                repeat: Infinity,
-                ease: "easeInOut",
-              },
-            }}
-          />
-        ))}
-      </motion.div>
+    <div className="about" ref={ref} aria-labelledby="about-heading">
+      <div className="about__glow about__glow--1" aria-hidden="true" />
+      <div className="about__glow about__glow--2" aria-hidden="true" />
 
-      <ContentContainer>
-        <TextContent
-          component={motion.div}
-          variants={containerVariants}
-          initial="hidden"
-          animate={controls}
+      <div className="about__inner">
+        {/* ── Left: Portrait ─────────────────────────── */}
+        <motion.div
+          className="about__visual-col"
+          initial={{ opacity: 0, x: -50 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-          <motion.div variants={itemVariants}>
-            <Typography
-              variant="h2"
-              gutterBottom
-              sx={{
-                textAlign: "left",
-                mb: 6,
-                background: "linear-gradient(45deg, #c62368, #f562a9)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontWeight: 800,
-                fontSize: { xs: "2.8rem", md: "4rem" },
-                textShadow: `
-            0 0 5px rgba(198, 35, 104, 0.5),
-            0 0 10px rgba(198, 35, 104, 0.4),
-            0 0 15px rgba(198, 35, 104, 0.3),
-            0 0 20px rgba(198, 35, 104, 0.2),
-            0 0 25px rgba(198, 35, 104, 0.1),
-            0 4px 8px rgba(0,0,0,0.3),
-            0 8px 16px rgba(0,0,0,0.2)
-          `,
-                letterSpacing: "1px",
-                lineHeight: "1.2",
-                fontFamily: "'Poppins', sans-serif",
-                position: "relative",
-                display: "inline-block",
-                "&::after": {
-                  content: '""',
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  mixBlendMode: "overlay",
-                  borderRadius: "inherit",
-                  pointerEvents: "none",
-                },
+          <TiltPortrait src={sarveishImage} alt="Sarveish Balasundram" />
+
+          {/* Location & Uni chips */}
+          <div className="about__chips">
+            <span className="about__chip">
+              <FaMapMarkerAlt className="about__chip-icon" /> Malaysia
+            </span>
+            <span className="about__chip">
+              <FaGraduationCap className="about__chip-icon" /> UTM Graduate (3.99 CGPA)
+            </span>
+          </div>
+        </motion.div>
+
+        {/* ── Right: Text & Stats ─────────────────────── */}
+        <motion.div
+          className="about__text-col"
+          initial={{ opacity: 0, x: 50 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="eyebrow-wrap">
+            <span className="eyebrow-line" aria-hidden="true" />
+            <p className="eyebrow">Get to know me</p>
+          </div>
+
+          <h2 id="about-heading" className="about__heading">
+            Architecting Future-Proof <span className="accent">Digital Solutions</span>
+          </h2>
+
+          <div className="about__bio-group">
+            <p className="about__bio">
+              I'm <strong className="text-highlight">Sarveish Balasundram</strong>, a{' '}
+              <strong className="text-highlight">Digital Business Analyst</strong> at{' '}
+              <strong className="text-highlight">Hilti Asia Services Sdn Bhd</strong> and a Software Engineering graduate from{' '}
+              <strong className="text-highlight">Universiti Teknologi Malaysia (UTM)</strong> with a First-Class Honours CGPA of <strong>3.99</strong>.
+            </p>
+
+            <p className="about__bio">
+              With hands-on experience spanning production fintech systems at <strong>Ant International</strong>, full-stack enterprise solutions at <strong>Worldtech Solutions</strong>, and winning national hackathons, I bridge business requirements and engineering execution. I specialize in <strong>React, Spring Boot, Java, and Agile digital transformation</strong>.
+            </p>
+
+            <p className="about__bio">
+              Beyond enterprise systems, I also actively <strong className="text-highlight">freelance developing custom websites and business applications</strong> — crafting fast, responsive, and production-ready digital experiences for clients.
+            </p>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="about__stats-grid">
+            {STATS.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                className="about__stat-card"
+                initial={{ opacity: 0, y: 20 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.35 + i * 0.1, duration: 0.5 }}
+                whileHover={{ y: -4, borderColor: 'rgba(196, 181, 253, 0.4)' }}
+              >
+                <div className="about__stat-icon">{stat.icon}</div>
+                <div className="about__stat-val">{stat.value}</div>
+                <div className="about__stat-lbl">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Action buttons */}
+          <div className="about__actions">
+            <motion.a
+              href={resume}
+              download="Sarveish_Balasundram_Resume.pdf"
+              className="btn btn--primary"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <FaDownload className="btn__icon" aria-hidden="true" />
+              <span>Download Resume</span>
+            </motion.a>
+
+            <motion.a
+              href="#contact"
+              className="btn btn--ghost"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              <TypeAnimation
-                sequence={[
-                  "About Me",
-                  1500,
-                  "My Journey",
-                  1500,
-                  "My Passion",
-                  1500,
-                ]}
-                wrapper="span"
-                speed={40}
-                repeat={Infinity}
-              />
-            </Typography>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Typography
-              variant="body1"
-              paragraph
-              sx={{ fontSize: "1.1rem", lineHeight: 1.8 }}
-            >
-              I'm <HighlightText>Sarveish</HighlightText>, a passionate{" "}
-              <HighlightText>Full-Stack Developer</HighlightText> with expertise
-              in creating modern, performant web applications that push
-              boundaries. Currently a third year student at{" "}
-              <HighlightText>Universiti Teknologi Malaysia (UTM)</HighlightText>{" "}
-              pursuing my{" "}
-              <HighlightText>
-                Bachelor's in Computer Science (Software Engineering)
-              </HighlightText>
-              , where I combine academic knowledge with practical development
-              experience.
-            </Typography>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Typography
-              variant="body1"
-              paragraph
-              sx={{ fontSize: "1.1rem", lineHeight: 1.8 }}
-            >
-              My journey in tech began with a curiosity for how things work,
-              which evolved into a deep love for building digital experiences
-              that make an impact.
-            </Typography>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Typography
-              variant="body1"
-              paragraph
-              sx={{ fontSize: "1.1rem", lineHeight: 1.8 }}
-            >
-              I specialize in <HighlightText>React</HighlightText>,{" "}
-              <HighlightText>Java</HighlightText>, and modern JavaScript
-              frameworks, with a strong focus on{" "}
-              <HighlightText>performance optimization</HighlightText> and{" "}
-              <HighlightText>user experience</HighlightText>.
-            </Typography>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Box sx={{ display: "inline-block", position: "relative", mt: 2 }}>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: "1.1rem",
-                  lineHeight: 1.8,
-                  fontStyle: "italic",
-                }}
-                component="span"
-              >
-                <TypeAnimation
-                  sequence={[
-                    "Turning complex problems into elegant solutions.",
-                    2000,
-                    "Building the web of tomorrow, today.",
-                    2000,
-                    "Code is poetry when written with passion.",
-                    2000,
-                  ]}
-                  wrapper="span"
-                  speed={50}
-                  repeat={Infinity}
-                />
-                <span
-                  style={{
-                    display: "inline-block",
-                    marginLeft: "2px",
-                    animation: "blink 0.7s infinite",
-                  }}
-                >
-                  |
-                </span>
-              </Typography>
-            </Box>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <ResumeButton
-              variant="contained"
-              href={resume}
-              download="Sarveish_Resume.pdf"
-              endIcon={<span>↓</span>}
-            >
-              Download Resume
-            </ResumeButton>
-          </motion.div>
-        </TextContent>
-
-        <PhotoContainer src={sarveishImage} />
-      </ContentContainer>
-    </AboutSection>
+              <FaPaperPlane className="btn__icon" aria-hidden="true" />
+              <span>Let's Talk</span>
+            </motion.a>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
-};
-
-export default AboutMe;
+}
