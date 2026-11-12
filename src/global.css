@@ -15,6 +15,9 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: var(--nav-height);
   -webkit-text-size-adjust: 100%;
+  /* Match the loader background from the very first paint — prevents any
+     white flash before React mounts or while the loader curtain is opening */
+  background: #08060D;
 }
 
 body {

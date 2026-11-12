@@ -12,6 +12,7 @@ import Projects from "./sections/Projects";
 import Contact from "./sections/Contact";
 import Footer from "./footer/footer";
 import Loader from "./loader/Loader";
+import { Analytics } from "@vercel/analytics/react";
 import "./global.css";
 
 /* ══════════════════════════════════════════════════════════
@@ -103,20 +104,21 @@ function ScrollToTop() {
 /* ══════════════════════════════════════════════════════════
    APP ROOT
 
-   loading   → <Loader /> plays; the site is NOT mounted yet, so the
-               main thread is free and every animation stays smooth.
-   revealing → the loader's curtain opens (pure CSS, GPU) and the site
-               mounts underneath it, so its entrance animations play
-               as the curtain parts.
-   done      → loader is removed, scrolling is unlocked.
+   loading   → <Loader /> plays; the main app renders BUT is fully
+               hidden (opacity 0 + visibility hidden) so React and
+               Three.js can hydrate silently with zero visual impact.
+               The main thread gets a head-start before the curtain opens.
+   revealing → loader's curtain slides open (pure CSS/GPU).  The app
+               underneath fades in with a short delay so it's already
+               painted and ready — zero white flash.
+   done      → loader unmounted, scrolling unlocked, everything visible.
 ══════════════════════════════════════════════════════════ */
-const defer = React.startTransition || ((fn) => fn());
 
 function AppInner() {
   const [phase, setPhase] = useState("loading");
 
   const handleReveal = useCallback(() => {
-    defer(() => setPhase((p) => (p === "loading" ? "revealing" : p)));
+    setPhase((p) => (p === "loading" ? "revealing" : p));
   }, []);
   const handleDone = useCallback(() => setPhase("done"), []);
 
@@ -127,47 +129,64 @@ function AppInner() {
     };
   }, [phase]);
 
+  /* Determine inline style for the app wrapper:
+     - "loading"   → invisible (but rendered so React can paint in background)
+     - "revealing" → fade in with a 200ms delay (curtain starts opening first)
+     - "done"      → fully visible, no transition overhead */
+  const appStyle =
+    phase === "loading"
+      ? { opacity: 0, visibility: "hidden" }
+      : phase === "revealing"
+        ? {
+            opacity: 1,
+            visibility: "visible",
+            transition: "opacity 0.5s ease 0.2s, visibility 0s linear 0.2s",
+          }
+        : { opacity: 1, visibility: "visible" };
+
   return (
     <>
       <CustomCursor />
 
-      {phase !== "loading" && (
-        <div key="main">
-          <Navbar />
-          <main>
-            <section id="home" aria-labelledby="hero-heading">
-              {" "}
-              <Header />{" "}
-            </section>
-            <section id="about" aria-labelledby="about-heading">
-              {" "}
-              <AboutMe />{" "}
-            </section>
-            <section id="projects" aria-labelledby="projects-heading">
-              <Projects />{" "}
-            </section>
-            <section id="experience" aria-labelledby="experience-heading">
-              <Education />
-            </section>
-            <section id="skills" aria-labelledby="skills-heading">
-              {" "}
-              <Skills />{" "}
-            </section>
-            <section id="achievements" aria-labelledby="achievements-heading">
-              <Cert />
-            </section>
-            <section id="contact" aria-labelledby="contact-heading">
-              <Contact />{" "}
-            </section>
-          </main>
-          <Footer />
-          <ScrollToTop />
-        </div>
-      )}
+      {/* Always mounted — hidden during loading so the site pre-renders
+          silently, eliminating the render spike that caused the white flash */}
+      <div style={appStyle}>
+        <Navbar />
+        <main>
+          <section id="home" aria-labelledby="hero-heading">
+            {" "}
+            <Header />{" "}
+          </section>
+          <section id="about" aria-labelledby="about-heading">
+            {" "}
+            <AboutMe />{" "}
+          </section>
+          <section id="projects" aria-labelledby="projects-heading">
+            <Projects />{" "}
+          </section>
+          <section id="experience" aria-labelledby="experience-heading">
+            <Education />
+          </section>
+          <section id="skills" aria-labelledby="skills-heading">
+            {" "}
+            <Skills />{" "}
+          </section>
+          <section id="achievements" aria-labelledby="achievements-heading">
+            <Cert />
+          </section>
+          <section id="contact" aria-labelledby="contact-heading">
+            <Contact />{" "}
+          </section>
+        </main>
+        <Footer />
+        <ScrollToTop />
+      </div>
 
       {phase !== "done" && (
         <Loader onReveal={handleReveal} onDone={handleDone} />
       )}
+
+      <Analytics />
 
       <style>{`
         /* ════════════════════════════════════════════════════
